@@ -1,0 +1,18 @@
+# Backups
+*.bak
+
+# Local / machine-specific config
+**/settings.local.json
+
+# Local AI-tooling artifacts
+.agents/
+.claude/skills/
+skills-lock.json
+
+# Dependencies
+node_modules/
+
+# OS junk
+Thumbs.db
+desktop.ini
+.DS_Store

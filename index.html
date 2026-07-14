@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dungeon of Shadows II — Serce Otchłani</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ============ EKRAN TYTUŁOWY ============ -->
+<div id="title-screen">
+  <div class="title-embers" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="title-logo">
+    <h1>DUNGEON OF SHADOWS</h1>
+    <div class="title-ii">II</div>
+    <div class="subtitle">SERCE OTCHŁANI</div>
+  </div>
+  <div class="title-lore">
+    Dziesięć lat po upadku Pożeracza Światła Otchłań zaczęła wylewać się na powierzchnię.<br>
+    Gdzieś w jej najgłębszym punkcie bije <b>Serce</b> — i tylko śmiałek, który przejdzie
+    przez pięć skażonych krain, może je przebić.
+  </div>
+  <div class="title-keys">
+    WASD — Ruch &nbsp;|&nbsp; Mysz — Celowanie &nbsp;|&nbsp; LPM — Atak &nbsp;|&nbsp; <b>Spacja — Unik</b> &nbsp;|&nbsp; 1-5 — Umiejętności<br>
+    Q / R — Mikstury &nbsp;|&nbsp; E — Interakcja &nbsp;|&nbsp; I — Ekwipunek i Kuźnia &nbsp;|&nbsp; Tab — Mapa &nbsp;|&nbsp; Esc — Menu
+  </div>
+  <div class="class-cards" id="class-cards"></div>
+  <div class="title-buttons">
+    <button onclick="Game.loadFromTitle()">📂 Wczytaj zapis</button>
+    <button onclick="MetaUI.open()">🔮 Sanktuarium Dusz</button>
+    <button onclick="MetaUI.openBestiary()">📖 Bestiariusz</button>
+    <button onclick="MetaUI.openAchievements()">🏅 Osiągnięcia</button>
+  </div>
+  <div class="title-meta-line" id="title-meta-line"></div>
+</div>
+
+<!-- ============ EKRANY KOŃCOWE ============ -->
+<div id="death-screen" class="end-screen">
+  <h1>ZGINĄŁEŚ</h1>
+  <div class="end-sub" id="death-cause"></div>
+  <div class="end-stats" id="death-stats"></div>
+  <div class="end-essence" id="death-essence"></div>
+  <button onclick="location.reload()">⚔️ Spróbuj ponownie</button>
+</div>
+
+<div id="win-screen" class="end-screen">
+  <h1>🫀 SERCE PRZEBITE!</h1>
+  <div class="end-sub">Otchłań drży w posadach. Ale głębia nie ma dna...</div>
+  <div class="end-stats" id="win-stats"></div>
+  <div class="end-essence" id="win-essence"></div>
+  <button onclick="Game.enterEndless()">🕳️ Głębia Bez Dna</button>
+  <button onclick="location.reload()">🏠 Powrót do menu</button>
+  <div class="end-hint">Głębia Bez Dna to nieskończone, coraz trudniejsze piętra. Esencję Dusz zachowasz niezależnie od wyniku.</div>
+</div>
+
+<!-- ============ AWANS ============ -->
+<div id="level-up-screen">
+  <h2>⬆️ AWANS!</h2>
+  <div id="level-up-info"></div>
+  <div id="level-up-choices" class="choices"></div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<!-- ============ HUD ============ -->
+<div id="ui-overlay">
+  <div id="hud">
+    <div class="hud-head">
+      <div id="hud-portrait"><span id="hud-portrait-icon">⚔️</span><span id="hud-level">1</span></div>
+      <div class="hud-title">
+        <div id="hud-name">Bohater</div>
+        <div id="hud-stats-line"><span id="hud-atk">⚔ 10</span><span id="hud-def">🛡 5</span><span id="hud-kills">💀 0</span></div>
+      </div>
+    </div>
+    <div class="label">HP</div>
+    <div class="bar" id="hp-bar-wrap"><div class="bar-ghost" id="hp-ghost" style="width:100%"></div><div class="bar-fill hp-fill" id="hp-bar" style="width:100%"></div><div class="bar-shield" id="hp-shield" style="width:0%"></div><div class="bar-text" id="hp-text">100/100</div></div>
+    <div class="label">MP</div>
+    <div class="bar"><div class="bar-fill mp-fill" id="mp-bar" style="width:100%"></div><div class="bar-text" id="mp-text">50/50</div></div>
+    <div class="label">XP</div>
+    <div class="bar bar-thin"><div class="bar-fill xp-fill" id="xp-bar" style="width:0%"></div><div class="bar-text" id="xp-text">0/100</div></div>
+    <div class="hud-bottom"><span id="hud-gold">💰 0</span><span id="hud-dust">✨ 0</span><span id="hud-floor">📍 1</span></div>
+    <div id="dash-pips"></div>
+  </div>
+  <div id="low-hp-overlay"></div>
+  <div id="buff-bar"></div>
+  <canvas id="minimap" width="168" height="168"></canvas>
+  <div id="minimap-label">📍 Piętro 1</div>
+  <div id="boss-hp"><div class="name"><span id="boss-name"></span><span id="boss-phase"></span></div><div class="bar"><div class="ghost" id="boss-ghost"></div><div class="fill" id="boss-hp-fill"></div><div class="tick t66"></div><div class="tick t33"></div></div></div>
+  <div id="quickslots"></div>
+  <div id="spell-bar"></div>
+  <div id="message-log"></div>
+  <div id="combo-display"></div>
+  <div id="achievement-toast"></div>
+  <div id="interact-hint"></div>
+</div>
+
+<!-- ============ PANELE ============ -->
+<div id="inventory-panel"></div>
+<div id="tooltip"></div>
+<div id="item-tooltip"></div>
+<div id="settings-panel"></div>
+<div id="meta-panel"></div>
+<div id="shop-panel"></div>
+<div id="save-toast"></div>
+<div id="floor-transition"><h1 id="ft-title"></h1><div class="floor-sub" id="ft-sub"></div></div>
+<div id="map-overlay"><canvas id="bigmap"></canvas><div class="map-hint">Tab / Esc — zamknij</div></div>
+
+<!-- ============ SKRYPTY ============ -->
+<script src="js/config.js"></script>
+<script src="js/util.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/content/biomes.js"></script>
+<script src="js/content/classes.js"></script>
+<script src="js/content/enemies.js"></script>
+<script src="js/content/items.js"></script>
+<script src="js/content/talents.js"></script>
+<script src="js/content/achievements.js"></script>
+<script src="js/engine/dungeon.js"></script>
+<script src="js/engine/fov.js"></script>
+<script src="js/engine/pathfind.js"></script>
+<script src="js/engine/particles.js"></script>
+<script src="js/game/meta.js"></script>
+<script src="js/game/core.js"></script>
+<script src="js/game/player.js"></script>
+<script src="js/game/combat.js"></script>
+<script src="js/game/skills.js"></script>
+<script src="js/game/enemies.js"></script>
+<script src="js/game/bosses.js"></script>
+<script src="js/game/inventory.js"></script>
+<script src="js/game/events.js"></script>
+<script src="js/game/shop.js"></script>
+<script src="js/game/progression.js"></script>
+<script src="js/game/save.js"></script>
+<script src="js/game/render.js"></script>
+<script src="js/game/hud.js"></script>
+<script src="js/game/input.js"></script>
+<script src="js/game/loop.js"></script>
+<script src="js/game/main.js"></script>
+</body>
+</html>
