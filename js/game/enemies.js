@@ -416,5 +416,13 @@ const Enemies = {
     Game.addCombo();
 
     if (e.isBoss) Bosses.onDeath(e);
+
+    // piętro oczyszczone — premia esencji
+    if (!s.floorCleared && s.enemies.every(o => o.dead || o === e)) {
+      s.floorCleared = true;
+      const bonus = Meta.addEssence(3 + Math.round(s.floor * .8));
+      Game.msg('🧹 Piętro oczyszczone! +' + bonus + ' ✨ Esencji Dusz', 'gold');
+      Sfx.play('achieve');
+    }
   },
 };

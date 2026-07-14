@@ -4,6 +4,7 @@
 (function init() {
   Meta.load();
   Sfx.volume = Meta.data.volume;
+  Music.volume = Meta.data.musicVolume;
 
   Renderer.init();
   Input.init();
@@ -25,6 +26,16 @@
     box.appendChild(card);
   }
 
+  // przycisk „Kontynuuj" z autozapisu
+  const auto = SaveSys.slotInfo(0);
+  if (auto && ClassDB[auto.cls]) {
+    const btn = document.createElement('button');
+    btn.style.borderColor = '#8a5fff';
+    btn.textContent = `▶️ Kontynuuj — ${ClassDB[auto.cls].icon} poz. ${auto.level}, piętro ${auto.floor}`;
+    btn.onclick = () => { Sfx.init(); Game.loadAndRun(0); };
+    U.el('title-buttons').prepend(btn);
+  }
+
   // linia meta na tytule
   const d = Meta.data;
   const parts = [];
@@ -34,6 +45,12 @@
   const got = Object.keys(d.achievements).length;
   if (got > 0) parts.push('🏅 ' + got + '/' + AchievementDB.list.length);
   U.el('title-meta-line').textContent = parts.join('  •  ');
+
+  // muzyka tytułowa od pierwszej interakcji (przeglądarki wymagają gestu)
+  document.addEventListener('pointerdown', () => {
+    Sfx.init();
+    if (!Game.s) Music.start('title');
+  }, { once: true });
 
   // start pętli
   requestAnimationFrame(t => { Game.lastT = t; Game.loop(t); });

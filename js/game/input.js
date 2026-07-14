@@ -7,7 +7,11 @@ const Input = {
   init() {
     window.addEventListener('keydown', e => this.keyDown(e));
     window.addEventListener('keyup', e => { Game.keys[e.key.toLowerCase()] = false; });
-    window.addEventListener('blur', () => { Game.keys = {}; Game.mouse.down = false; });
+    window.addEventListener('blur', () => {
+      Game.keys = {}; Game.mouse.down = false;
+      // auto-pauza: bez tego wrogowie tłukliby gracza, gdy patrzy w inne okno
+      if (Game.alive() && !Game.s.paused && !SettingsUI.visible) SettingsUI.toggle();
+    });
 
     const cv = Renderer.canvas;
     window.addEventListener('mousemove', e => {
@@ -43,6 +47,7 @@ const Input = {
     // Esc — zamykanie paneli / pauza
     if (k === 'escape') {
       e.preventDefault();
+      if (U.el('level-up-screen').style.display === 'flex') return; // najpierw wybierz talent
       if (Shop.visible) { Shop.close(); return; }
       if (InvUI.visible) { InvUI.toggle(); return; }
       if (this.mapOpen) { this.toggleMap(); return; }
@@ -70,7 +75,7 @@ const Input = {
       case ' ': e.preventDefault(); Player.dash(); break;
       case '1': case '2': case '3': case '4': case '5':
         Skills.cast(+k - 1); break;
-      case 'e': Events.interact(); break;
+      case 'e': case 'f': Events.interact(); break;
       case 'q': Inv.quickUse('hp'); break;
       case 'r': Inv.quickUse('mp'); break;
       case 'i': InvUI.toggle(); break;

@@ -42,6 +42,8 @@ Object.assign(Game, {
     FOV.update(s.map, p.x, p.y, FOV_RADIUS);
     Path.compute(s.map, p.x, p.y);
     Hud.setFloorLabel();
+    Music.start(s.map.biome.id);
+    s.floorCleared = false;
 
     // osiągnięcia głębokości
     if (floor >= 5) Meta.unlock('floor5');
@@ -113,6 +115,7 @@ Object.assign(Game, {
   },
 
   loadAndRun(slot) {
+    Sfx.init();
     // wyczyść ewentualny stary stan
     this.s = null;
     if (!SaveSys.load(slot)) {

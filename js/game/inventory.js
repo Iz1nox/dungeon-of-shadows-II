@@ -342,6 +342,7 @@ const ItemTip = {
       }
       if (item.legendTxt) html += `<div class="tt-legend">★ ${item.legendTxt}</div>`;
       if (item.flavor) html += `<div class="tt-flavor">„${item.flavor}"</div>`;
+      html += this.compareHtml(item);
       html += `<div class="tt-actions">Wartość: 💰${ItemDB.sellPrice(item)} • Przetop: ✨${ItemDB.salvageValue(item)}</div>`;
     } else {
       const def = ItemDB.consumables[item.cid];
@@ -352,6 +353,23 @@ const ItemTip = {
     el.style.display = 'block';
     this.move(ev);
   },
+  // porównanie z założonym przedmiotem w tym slocie
+  compareHtml(item) {
+    if (!Game.s || item.kind !== 'equip') return '';
+    const eq = Game.s.p.equip[item.slot];
+    if (!eq || eq === item) return '';
+    const val = (it, k) => Math.round((it.stats[k] || 0) * (1 + it.plus * .12));
+    const names = { atk: 'ataku', def: 'pancerza', hp: 'HP', mp: 'MP' };
+    let rows = '';
+    for (const k of ['atk', 'def', 'hp', 'mp']) {
+      const d = val(item, k) - val(eq, k);
+      if (!d) continue;
+      rows += `<div style="color:${d > 0 ? '#7ae08a' : '#ff7a6a'}">${d > 0 ? '▲ +' : '▼ '}${d} ${names[k]}</div>`;
+    }
+    const eqRar = ItemDB.rarities[eq.rarity];
+    return `<div class="tt-actions">vs założony: <span style="color:${eqRar.color}">${U.esc(eq.name)}${eq.plus ? ' +' + eq.plus : ''}</span>${rows || '<div style="color:#7a6f96">te same statystyki bazowe</div>'}</div>`;
+  },
+
   move(ev) {
     const el = U.el('item-tooltip');
     const x = Math.min(ev.clientX + 16, window.innerWidth - el.offsetWidth - 10);

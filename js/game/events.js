@@ -53,7 +53,7 @@ const Events = {
       Sfx.play('mimic');
       Fx.shake(5);
       Game.msg('📦 TO MIMIK!', 'bad');
-      const m = Enemies.make('mimic', x + .5, y + .5, { noElite: true, mult: 1 + s.floor * .18 });
+      const m = Enemies.make('mimic', x + .5, y + .5, { noElite: true, mult: 1.35 });
       m.aggro = true;
       s.enemies.push(m);
       return;

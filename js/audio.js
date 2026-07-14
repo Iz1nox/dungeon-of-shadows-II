@@ -92,3 +92,74 @@ const Sfx = {
     }
   },
 };
+
+// Proceduralna muzyka ambientowa — wolno ewoluujący pad, inny akord na biom.
+const Music = {
+  volume: .3,
+  current: null, // { biomeId, master, nodes[] }
+
+  // nuta bazowa (Hz) i interwały akordu per biom
+  themes: {
+    title:     { root: 110.00, chord: [1, 1.5, 2], filter: 700 },          // A2 — pusta kwinta
+    catacombs: { root: 110.00, chord: [1, 1.189, 1.5, 2], filter: 650 },   // A2 moll
+    fungal:    { root: 98.00,  chord: [1, 1.26, 1.5, 1.888], filter: 800 },// G2 dur7 — obco-organicznie
+    frozen:    { root: 123.47, chord: [1, 1.189, 1.782, 2], filter: 900 }, // B2 moll add6
+    inferno:   { root: 87.31,  chord: [1, 1.335, 1.414, 2], filter: 550 }, // F2 z trytonem — groza
+    mirror:    { root: 130.81, chord: [1, 1.26, 1.5, 1.682], filter: 1100 },// C3 dur6 — szklarnie
+    heart:     { root: 73.42,  chord: [1, 1.189, 1.414, 1.587], filter: 480 },// D2 zmniejszony — finał
+    endless:   { root: 82.41,  chord: [1, 1.189, 1.5, 2.378], filter: 600 },  // E2 moll9
+  },
+
+  setVolume(v) {
+    this.volume = v;
+    if (this.current) this.current.master.gain.setTargetAtTime(v, Sfx.ctx.currentTime, .3);
+  },
+
+  start(biomeId) {
+    if (!Sfx.ctx || !Sfx.enabled) return;
+    if (this.current && this.current.biomeId === biomeId) return;
+    this.stop();
+    const th = this.themes[biomeId] || this.themes.title;
+    const ctx = Sfx.ctx, t = ctx.currentTime;
+
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0, t);
+    master.gain.linearRampToValueAtTime(this.volume, t + 3); // wolne wejście
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = th.filter;
+    filter.connect(master);
+    master.connect(Sfx.master);
+
+    const nodes = [master, filter];
+    th.chord.forEach((ratio, i) => {
+      const o = ctx.createOscillator();
+      o.type = i === 0 ? 'triangle' : 'sine';
+      o.frequency.value = th.root * ratio * (i === 2 ? 1.002 : 1); // lekki rozstrój
+      const g = ctx.createGain();
+      g.gain.value = i === 0 ? .16 : .1;
+      // każdy głos oddycha w innym tempie
+      const lfo = ctx.createOscillator();
+      lfo.frequency.value = .04 + i * .023;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = i === 0 ? .06 : .045;
+      lfo.connect(lfoGain); lfoGain.connect(g.gain);
+      o.connect(g); g.connect(filter);
+      o.start(t); lfo.start(t);
+      nodes.push(o, g, lfo, lfoGain);
+    });
+
+    this.current = { biomeId, master, nodes };
+  },
+
+  stop() {
+    if (!this.current || !Sfx.ctx) return;
+    const { master, nodes } = this.current;
+    const t = Sfx.ctx.currentTime;
+    master.gain.cancelScheduledValues(t);
+    master.gain.setValueAtTime(master.gain.value, t);
+    master.gain.linearRampToValueAtTime(0, t + 2); // wolne zejście
+    setTimeout(() => nodes.forEach(n => { try { n.stop ? n.stop() : n.disconnect(); } catch (e) { } }), 2300);
+    this.current = null;
+  },
+};

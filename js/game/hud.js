@@ -122,6 +122,9 @@ const Hud = {
   updateQuickslots() {
     const qs = U.el('quickslots');
     const hp = Inv.countPotions('hp'), mp = Inv.countPotions('mp');
+    const key = hp + '/' + mp;
+    if (qs._last === key) return;
+    qs._last = key;
     qs.innerHTML = `
       <div class="qslot ${hp ? '' : 'empty'}" onclick="Inv.quickUse('hp')" title="Mikstura zdrowia">
         🧪<span class="qk">Q</span><span class="qn">${hp}</span></div>
@@ -355,9 +358,12 @@ const SettingsUI = {
       <button class="panel-close" onclick="SettingsUI.toggle()">✕</button>
       <h3>⚙️ ${inGame ? 'Pauza' : 'Ustawienia'}</h3>
       <div class="p-sub">${inGame ? 'Gra wstrzymana' : 'Dungeon of Shadows II v' + GAME_VERSION}</div>
-      <div class="set-row"><span>🔊 Głośność</span>
+      <div class="set-row"><span>🔊 Efekty dźwiękowe</span>
         <input type="range" min="0" max="100" value="${Math.round(Sfx.volume * 100)}"
           oninput="SettingsUI.setVolume(this.value)"></div>
+      <div class="set-row"><span>🎵 Muzyka</span>
+        <input type="range" min="0" max="100" value="${Math.round(Music.volume * 100)}"
+          oninput="SettingsUI.setMusicVolume(this.value)"></div>
       <div class="set-row"><span>📳 Wstrząsy ekranu</span>
         <input type="checkbox" ${Meta.data.screenShake ? 'checked' : ''} onchange="SettingsUI.setShake(this.checked)"></div>
       <h3 style="font-size:15px;margin-top:14px">💾 Zapisy</h3>
@@ -371,6 +377,12 @@ const SettingsUI = {
   setVolume(v) {
     Sfx.setVolume(v / 100);
     Meta.data.volume = v / 100;
+    Meta.save();
+  },
+
+  setMusicVolume(v) {
+    Music.setVolume(v / 100);
+    Meta.data.musicVolume = v / 100;
     Meta.save();
   },
 

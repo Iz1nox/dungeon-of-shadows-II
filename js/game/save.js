@@ -134,6 +134,8 @@ const SaveSys = {
     Path.compute(map, p.x, p.y);
     Hud.buildSpellBar();
     Hud.setFloorLabel();
+    Music.start(biome.id);
+    s.floorCleared = s.enemies.length === 0;
     Game.msg('📂 Wczytano grę — ' + biome.name + ', piętro ' + s.floor + '.', 'sys');
     return true;
   },

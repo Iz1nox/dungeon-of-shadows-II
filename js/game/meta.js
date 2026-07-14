@@ -42,6 +42,7 @@ const Meta = {
     d.stats = Object.assign({ kills: 0, elites: 0, dashes: 0, wins: 0, runs: 0, deepest: 0 }, d.stats);
     d.classesPlayed = d.classesPlayed || {};
     d.volume = d.volume !== undefined ? d.volume : .5;
+    d.musicVolume = d.musicVolume !== undefined ? d.musicVolume : .3;
     d.screenShake = d.screenShake !== undefined ? d.screenShake : true;
   },
 

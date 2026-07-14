@@ -47,6 +47,19 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 - **Głębia Bez Dna** — nieskończony endgame ze skalowaniem i bossami co 5 pięter
 - Oświetlenie dynamiczne, pogoda per biom, cząsteczki, wstrząsy ekranu, syntezowany dźwięk (WebAudio)
 
+## Changelog
+
+**1.1.0**
+- 🎵 proceduralna muzyka ambientowa — inny motyw w każdym biomie (suwak w ustawieniach)
+- ▶️ przycisk „Kontynuuj" na ekranie tytułowym (z autozapisu)
+- ⚖️ tooltip przedmiotu porównuje statystyki z założonym
+- 🧹 premia Esencji za wyczyszczenie całego piętra
+- ⏸️ auto-pauza przy przełączeniu okna; Esc nie przerywa wyboru talentu
+- 🇫 klawisz F działa jak E (interakcja — jak w części I)
+- 🔧 fix: panele tytułu (Bestiariusz/Osiągnięcia/Sanktuarium) otwierały się pod ekranem tytułowym
+- 🔧 fix: Mimik nie skaluje się już podwójnie z piętrem
+- 🚀 cache-busting zasobów — aktualizacje bez Ctrl+F5
+
 ## Struktura kodu
 
 ```
