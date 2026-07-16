@@ -16,7 +16,7 @@ const SaveSys = {
         cls: p.cls, level: p.level, xp: p.xp, xpNext: p.xpNext,
         hp: p.hp, mp: p.mp, gold: p.gold, dust: p.dust,
         x: p.x, y: p.y,
-        talents: p.talents, altarBonus: p.altarBonus || 0,
+        talents: p.talents, talentPoints: p.talentPoints || 0, altarBonus: p.altarBonus || 0,
         equip: p.equip, inv: p.inv.map(item),
         phoenixFloorUsed: p.phoenixFloorUsed, metaReviveUsed: p.metaReviveUsed,
         dashCharges: p.dashCharges,
@@ -102,6 +102,7 @@ const SaveSys = {
     p.gold = dp.gold; p.dust = dp.dust;
     p.x = dp.x; p.y = dp.y;
     p.talents = dp.talents || {};
+    p.talentPoints = dp.talentPoints || 0;
     p.altarBonus = dp.altarBonus || 0;
     p.equip = dp.equip;
     p.inv = dp.inv || [];

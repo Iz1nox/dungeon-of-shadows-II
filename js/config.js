@@ -4,7 +4,7 @@
 // =============================================
 'use strict';
 
-const GAME_VERSION = '1.1.0';
+const GAME_VERSION = '1.2.0';
 const SAVE_VERSION = 1;
 const SAVE_KEY = 'dos2_save_';
 const META_KEY = 'dos2_meta';
@@ -50,7 +50,7 @@ const BAL = {
   dashRecharge: 3.2,
   dashChargesBase: 2,
   regenDelay: 4,            // s od otrzymania obrażeń do naturalnej regeneracji
-  baseRegenHp: 0.6,
+  baseRegenHp: 0.4,
   baseRegenMp: 2.2,
   comboWindow: 3.2,
   lowHpPct: .3,
@@ -62,8 +62,8 @@ const BAL = {
   enemyHpPerFloor: .10,     // mnożnik na piętro w ramach głębi
   enemyAtkPerFloor: .07,
   endlessScale: .16,        // dodatkowe skalowanie za każde piętro po 16
-  eliteChanceBase: .07,
-  eliteChancePerFloor: .012,
+  eliteChanceBase: .1,
+  eliteChancePerFloor: .015,
   eliteHpMult: 2.3,
   eliteAtkMult: 1.45,
   eliteRewardMult: 3,
@@ -74,7 +74,7 @@ const BAL = {
 
   // loot
   dropChance: .24,
-  potionDropChance: .38,    // udział mikstur w dropach
+  potionDropChance: .34,    // udział mikstur w dropach
   goldBase: 1,
 
   // statusy

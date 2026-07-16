@@ -68,6 +68,14 @@ const Hud = {
       }
     }
 
+    // wskaźnik odłożonych punktów talentu
+    const th = U.el('talent-hint');
+    if (p.talentPoints > 0 && !s.paused) {
+      th.style.display = 'block';
+      const label = '✨ Punkty talentu: ' + p.talentPoints + ' — wciśnij T';
+      if (th._last !== label) { th.innerHTML = label; th._last = label; }
+    } else th.style.display = 'none';
+
     // podpowiedź interakcji
     const it = Events.findInteractable();
     const hint = U.el('interact-hint');
@@ -318,6 +326,22 @@ const MetaUI = {
       <h3>🏅 Osiągnięcia</h3>
       <div class="p-sub">Zdobyto ${got}/${AchievementDB.list.length}.</div>
       <div class="ach-grid">${cards}</div>`;
+  },
+
+  openChangelog() {
+    const el = U.el('meta-panel');
+    el.classList.add('panel');
+    el.style.display = 'block';
+    let html = '';
+    for (const rel of ChangelogDB) {
+      html += `<div class="log-ver">v${rel.v} — ${U.esc(rel.name)} <span class="log-date">${rel.date}</span></div>
+        <ul class="log-list">${rel.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+    }
+    el.innerHTML = `
+      <button class="panel-close" onclick="MetaUI.close()">✕</button>
+      <h3>📜 Nowości</h3>
+      <div class="p-sub">Historia aktualizacji Dungeon of Shadows II</div>
+      ${html}`;
   },
 
   close() { U.el('meta-panel').style.display = 'none'; },

@@ -74,6 +74,7 @@ const Renderer = {
   draw(dt) {
     const s = Game.s;
     if (!s || !s.map) return;
+    if (!this.canvas.width || !this.canvas.height) return; // okno zminimalizowane/ukryte
     this.time += dt;
     const ctx = this.ctx, T = TILE_SIZE;
     const cw = this.canvas.width, ch = this.canvas.height;
@@ -116,14 +117,14 @@ const Renderer = {
       }
     }
 
-    // dekoracje
+    // dekoracje — celowo małe i przygaszone, żeby nie mylić z wrogami/łupami
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     for (const d of map.deco) {
       if (d.x < x0 || d.x > x1 || d.y < y0 || d.y > y1) continue;
       const i = (d.y | 0) * map.w + (d.x | 0);
       if (!map.explored[i]) continue;
-      ctx.globalAlpha = map.visible[i] ? .85 : .3;
-      ctx.font = Math.round(T * d.s) + 'px serif';
+      ctx.globalAlpha = map.visible[i] ? .5 : .2;
+      ctx.font = Math.round(T * d.s * .55) + 'px serif';
       ctx.fillText(d.icon, wx2sx(d.x), wy2sy(d.y));
     }
     ctx.globalAlpha = 1;
@@ -176,21 +177,29 @@ const Renderer = {
       ctx.beginPath(); ctx.arc(sx, sy, tg.r * T, 0, 6.29); ctx.stroke();
     }
 
-    // łupy
+    // łupy — mniejsze niż wrogowie, z podstawką i promieniem rzadkości
     for (const d of s.drops) {
       const i = (d.y | 0) * map.w + (d.x | 0);
       if (!map.explored[i]) continue;
-      const sx = wx2sx(d.x), sy = wy2sy(d.y) + Math.sin(d.bob) * 3;
+      const sx = wx2sx(d.x), sy = wy2sy(d.y) + Math.sin(d.bob) * 2.5;
       const rar = ItemDB.rarities[d.item.rarity];
+      // podstawka: każdy przedmiot na ziemi ma cień + jasny pierścień
+      ctx.fillStyle = 'rgba(0,0,0,.4)';
+      ctx.beginPath(); ctx.ellipse(sx, wy2sy(d.y) + T * .18, T * .2, T * .08, 0, 0, 6.29); ctx.fill();
+      ctx.strokeStyle = rar.color;
+      ctx.globalAlpha = .55 + Math.sin(this.time * 4 + d.bob) * .2;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.ellipse(sx, wy2sy(d.y) + T * .18, T * .24, T * .1, 0, 0, 6.29); ctx.stroke();
+      ctx.globalAlpha = 1;
       if (d.item.rarity !== 'common') {
-        ctx.globalAlpha = .45 + Math.sin(this.time * 4 + d.bob) * .15;
-        const g = ctx.createRadialGradient(sx, sy, 2, sx, sy, T * .55);
+        ctx.globalAlpha = .4 + Math.sin(this.time * 4 + d.bob) * .15;
+        const g = ctx.createRadialGradient(sx, sy, 2, sx, sy, T * .4);
         g.addColorStop(0, rar.color); g.addColorStop(1, 'transparent');
         ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(sx, sy, T * .55, 0, 6.29); ctx.fill();
+        ctx.beginPath(); ctx.arc(sx, sy, T * .4, 0, 6.29); ctx.fill();
         ctx.globalAlpha = 1;
       }
-      ctx.font = Math.round(T * .55) + 'px serif';
+      ctx.font = Math.round(T * .4) + 'px serif';
       ctx.fillText(d.item.icon, sx, sy);
     }
 

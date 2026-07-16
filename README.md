@@ -49,6 +49,12 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.2.0** *(feedback graczy)*
+- ⭐ awans nie pauzuje gry — punkty talentu kumulują się, wybór pod klawiszem **T** (Esc odkłada)
+- ⚔️ wyższa trudność: mocniejsze skalowanie wrogów, więcej ich, częstsze elity, czujniejsze aggro, wolniejsza regeneracja HP
+- 👁️ czytelniejsza ziemia: dekoracje mniejsze/przygaszone, przedmioty mniejsze z podstawką i obwódką rzadkości
+- 📜 panel „Nowości" (release notes) w menu
+
 **1.1.0**
 - 🎵 proceduralna muzyka ambientowa — inny motyw w każdym biomie (suwak w ustawieniach)
 - ▶️ przycisk „Kontynuuj" na ekranie tytułowym (z autozapisu)

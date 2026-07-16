@@ -4,7 +4,7 @@
 const Enemies = {
 
   floorMult(floor) {
-    let m = 1 + (floor - 1) * .04;
+    let m = 1 + (floor - 1) * .065;
     if (floor > FINAL_FLOOR) m *= 1 + (floor - FINAL_FLOOR) * BAL.endlessScale;
     return m;
   },
@@ -23,7 +23,7 @@ const Enemies = {
       ai: def.ai, element: def.element || 'phys',
       resist: def.resist, weak: def.weak,
       statuses: {}, hitFlashT: 0,
-      aggro: false, aggroRange: 8.5,
+      aggro: false, aggroRange: 9.2,
       attackCdT: U.rand(0, .5), meleeCd: .95,
       def_: def,
       elite: null,
@@ -56,7 +56,7 @@ const Enemies = {
     const s = Game.s, map = s.map;
     const pool = EnemyDB.poolFor(s.floor);
     const bossId = EnemyDB.bossFor(s.floor);
-    let count = Math.min(30, 13 + s.floor);
+    let count = Math.min(34, 14 + Math.round(s.floor * 1.4));
     if (bossId) count = Math.round(count * .55);
     if (s.floor === FINAL_FLOOR) count = 4;
 

@@ -47,7 +47,7 @@ const Input = {
     // Esc — zamykanie paneli / pauza
     if (k === 'escape') {
       e.preventDefault();
-      if (U.el('level-up-screen').style.display === 'flex') return; // najpierw wybierz talent
+      if (U.el('level-up-screen').style.display === 'flex') { Progression.closeTalentChoice(); return; } // odłóż wybór na później
       if (Shop.visible) { Shop.close(); return; }
       if (InvUI.visible) { InvUI.toggle(); return; }
       if (this.mapOpen) { this.toggleMap(); return; }
@@ -79,6 +79,7 @@ const Input = {
       case 'q': Inv.quickUse('hp'); break;
       case 'r': Inv.quickUse('mp'); break;
       case 'i': InvUI.toggle(); break;
+      case 't': Progression.showTalentChoice(); break;
     }
   },
 

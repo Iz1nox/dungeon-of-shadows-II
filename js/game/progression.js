@@ -30,18 +30,21 @@ const Progression = {
     p.hp = p.d.maxHp;
     p.mp = p.d.maxMp;
     if (p.level >= 20) Meta.unlock('level20');
-    this.showTalentChoice();
+    // punkt talentu do banku — gracz wybiera, kiedy chce (T)
+    p.talentPoints = (p.talentPoints || 0) + 1;
+    Game.msg('⬆️ Poziom ' + p.level + '! Punkt talentu — wciśnij T, kiedy zechcesz.', 'gold');
   },
 
   showTalentChoice() {
     const s = Game.s, p = s.p;
+    if (!Game.alive() || !(p.talentPoints > 0)) return;
     const choices = TalentDB.choicesFor(p);
-    if (!choices.length) return;
+    if (!choices.length) { p.talentPoints = 0; return; } // wszystko wymaksowane
     s.paused = true;
     const scr = U.el('level-up-screen');
     scr.style.display = 'flex';
     U.el('level-up-info').textContent =
-      `Poziom ${p.level} — wybierz talent (❤️ i 🔮 w pełni odnowione)`;
+      `Punkty talentu: ${p.talentPoints} — wybierz wzmocnienie (Esc — wybierzesz później)`;
     const box = U.el('level-up-choices');
     box.innerHTML = '';
     for (const t of choices) {
@@ -58,14 +61,20 @@ const Progression = {
     }
   },
 
+  closeTalentChoice() {
+    U.el('level-up-screen').style.display = 'none';
+    if (Game.s) Game.s.paused = false;
+  },
+
   pickTalent(id) {
     const s = Game.s, p = s.p;
     p.talents[id] = (p.talents[id] || 0) + 1;
+    p.talentPoints = Math.max(0, (p.talentPoints || 0) - 1);
     Player.recalc(p);
-    U.el('level-up-screen').style.display = 'none';
-    s.paused = false;
     Sfx.play('buff');
     const t = TalentDB.byId(id, p.cls);
     Game.msg('⬆️ Talent: ' + t.name + ' (ranga ' + p.talents[id] + ')', 'gold');
+    if (p.talentPoints > 0) this.showTalentChoice(); // kolejny punkt od razu
+    else this.closeTalentChoice();
   },
 };

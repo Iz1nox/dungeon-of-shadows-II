@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dungeon of Shadows II — Serce Otchłani</title>
-<link rel="stylesheet" href="css/styles.css?v=110">
+<link rel="stylesheet" href="css/styles.css?v=120">
 </head>
 <body>
 
@@ -23,7 +23,7 @@
   </div>
   <div class="title-keys">
     WASD — Ruch &nbsp;|&nbsp; Mysz — Celowanie &nbsp;|&nbsp; LPM — Atak &nbsp;|&nbsp; <b>Spacja — Unik</b> &nbsp;|&nbsp; 1-5 — Umiejętności<br>
-    Q / R — Mikstury &nbsp;|&nbsp; E — Interakcja &nbsp;|&nbsp; I — Ekwipunek i Kuźnia &nbsp;|&nbsp; Tab — Mapa &nbsp;|&nbsp; Esc — Menu
+    Q / R — Mikstury &nbsp;|&nbsp; E / F — Interakcja &nbsp;|&nbsp; I — Ekwipunek i Kuźnia &nbsp;|&nbsp; <b>T — Talenty</b> &nbsp;|&nbsp; Tab — Mapa &nbsp;|&nbsp; Esc — Menu
   </div>
   <div class="class-cards" id="class-cards"></div>
   <div class="title-buttons" id="title-buttons">
@@ -31,6 +31,7 @@
     <button onclick="MetaUI.open()">🔮 Sanktuarium Dusz</button>
     <button onclick="MetaUI.openBestiary()">📖 Bestiariusz</button>
     <button onclick="MetaUI.openAchievements()">🏅 Osiągnięcia</button>
+    <button onclick="MetaUI.openChangelog()">📜 Nowości</button>
   </div>
   <a class="title-crosslink" href="https://bibliotekabobrzyce.pl/">← Część I: oryginalny Dungeon of Shadows</a>
   <div class="title-meta-line" id="title-meta-line"></div>
@@ -94,6 +95,7 @@
   <div id="combo-display"></div>
   <div id="achievement-toast"></div>
   <div id="interact-hint"></div>
+  <div id="talent-hint" onclick="Progression.showTalentChoice()"></div>
 </div>
 
 <!-- ============ PANELE ============ -->
@@ -108,35 +110,36 @@
 <div id="map-overlay"><canvas id="bigmap"></canvas><div class="map-hint">Tab / Esc — zamknij</div></div>
 
 <!-- ============ SKRYPTY ============ -->
-<script src="js/config.js?v=110"></script>
-<script src="js/util.js?v=110"></script>
-<script src="js/audio.js?v=110"></script>
-<script src="js/content/biomes.js?v=110"></script>
-<script src="js/content/classes.js?v=110"></script>
-<script src="js/content/enemies.js?v=110"></script>
-<script src="js/content/items.js?v=110"></script>
-<script src="js/content/talents.js?v=110"></script>
-<script src="js/content/achievements.js?v=110"></script>
-<script src="js/engine/dungeon.js?v=110"></script>
-<script src="js/engine/fov.js?v=110"></script>
-<script src="js/engine/pathfind.js?v=110"></script>
-<script src="js/engine/particles.js?v=110"></script>
-<script src="js/game/meta.js?v=110"></script>
-<script src="js/game/core.js?v=110"></script>
-<script src="js/game/player.js?v=110"></script>
-<script src="js/game/combat.js?v=110"></script>
-<script src="js/game/skills.js?v=110"></script>
-<script src="js/game/enemies.js?v=110"></script>
-<script src="js/game/bosses.js?v=110"></script>
-<script src="js/game/inventory.js?v=110"></script>
-<script src="js/game/events.js?v=110"></script>
-<script src="js/game/shop.js?v=110"></script>
-<script src="js/game/progression.js?v=110"></script>
-<script src="js/game/save.js?v=110"></script>
-<script src="js/game/render.js?v=110"></script>
-<script src="js/game/hud.js?v=110"></script>
-<script src="js/game/input.js?v=110"></script>
-<script src="js/game/loop.js?v=110"></script>
-<script src="js/game/main.js?v=110"></script>
+<script src="js/config.js?v=120"></script>
+<script src="js/util.js?v=120"></script>
+<script src="js/audio.js?v=120"></script>
+<script src="js/content/biomes.js?v=120"></script>
+<script src="js/content/classes.js?v=120"></script>
+<script src="js/content/enemies.js?v=120"></script>
+<script src="js/content/items.js?v=120"></script>
+<script src="js/content/talents.js?v=120"></script>
+<script src="js/content/achievements.js?v=120"></script>
+<script src="js/content/changelog.js?v=120"></script>
+<script src="js/engine/dungeon.js?v=120"></script>
+<script src="js/engine/fov.js?v=120"></script>
+<script src="js/engine/pathfind.js?v=120"></script>
+<script src="js/engine/particles.js?v=120"></script>
+<script src="js/game/meta.js?v=120"></script>
+<script src="js/game/core.js?v=120"></script>
+<script src="js/game/player.js?v=120"></script>
+<script src="js/game/combat.js?v=120"></script>
+<script src="js/game/skills.js?v=120"></script>
+<script src="js/game/enemies.js?v=120"></script>
+<script src="js/game/bosses.js?v=120"></script>
+<script src="js/game/inventory.js?v=120"></script>
+<script src="js/game/events.js?v=120"></script>
+<script src="js/game/shop.js?v=120"></script>
+<script src="js/game/progression.js?v=120"></script>
+<script src="js/game/save.js?v=120"></script>
+<script src="js/game/render.js?v=120"></script>
+<script src="js/game/hud.js?v=120"></script>
+<script src="js/game/input.js?v=120"></script>
+<script src="js/game/loop.js?v=120"></script>
+<script src="js/game/main.js?v=120"></script>
 </body>
 </html>
