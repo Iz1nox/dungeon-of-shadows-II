@@ -10,6 +10,7 @@ const SaveSys = {
       v: SAVE_VERSION, gameVersion: GAME_VERSION,
       when: Date.now(),
       floor: s.floor, endless: s.endless, time: s.time,
+      difficulty: s.difficulty || 'normal',
       runStats: s.runStats,
       shopStock: s.shopStock,
       player: {
@@ -80,6 +81,7 @@ const SaveSys = {
     const s = Game.newRunState(d.player.cls);
     Game.s = s;
     s.floor = d.floor; s.endless = !!d.endless; s.time = d.time || 0;
+    s.difficulty = d.difficulty || 'normal';
     s.runStats = Object.assign(s.runStats, d.runStats);
     s.shopStock = d.shopStock || null;
 

@@ -3,6 +3,16 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.3.0', date: '16.07.2026', name: 'Rekordy i Koszmar',
+    items: [
+      '🎚️ Trzy poziomy trudności do wyboru na ekranie tytułowym: <b>Wędrowiec</b> (łagodniej), <b>Śmiałek</b> i <b>Koszmar</b> (+50% HP wrogów, więcej elit, ale esencja ×1,6)',
+      '🏆 Panel „Rekordy": najgłębsze zejście, najszybsze zwycięstwo, rekordy zabójstw, poziomu i złota',
+      '📊 Podsumowanie piętra przy zejściu na kolejne (zabójstwa, złoto, łupy, czas)',
+      '💀 Filmowe intro bossów przy pierwszym spotkaniu',
+      '🔗 Ikona gry w karcie przeglądarki i ładny podgląd linku przy udostępnianiu',
+    ],
+  },
+  {
     v: '1.2.0', date: '16.07.2026', name: 'Głos Graczy',
     items: [
       '⭐ Awans nie przerywa już gry — punkty talentu się kumulują, wybierasz je klawiszem <b>T</b>, kiedy chcesz (Esc odkłada wybór)',

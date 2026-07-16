@@ -40,6 +40,8 @@ const Meta = {
     d.achievements = d.achievements || {};
     d.bestiary = d.bestiary || {};
     d.stats = Object.assign({ kills: 0, elites: 0, dashes: 0, wins: 0, runs: 0, deepest: 0 }, d.stats);
+    d.records = d.records || {};
+    d.difficulty = d.difficulty || 'normal';
     d.classesPlayed = d.classesPlayed || {};
     d.volume = d.volume !== undefined ? d.volume : .5;
     d.musicVolume = d.musicVolume !== undefined ? d.musicVolume : .3;
@@ -86,10 +88,24 @@ const Meta = {
   },
 
   addEssence(n) {
-    n = Math.round(n * (1 + this.bonuses().essencePct));
+    n = Math.round(n * (1 + this.bonuses().essencePct) * Game.diff().essence);
     this.data.essence += n;
     this.data.totalEssence += n;
     return n;
+  },
+
+  // rekordy najlepszych wypraw (lokalnie)
+  updateRecords(s, won) {
+    const r = this.data.records, p = s.p, rs = s.runStats;
+    const stamp = { cls: p.cls, diff: s.difficulty || 'normal', when: Date.now() };
+    const beat = (cur, val, lowerIsBetter = false) =>
+      !cur || (lowerIsBetter ? val < cur.val : val > cur.val);
+    if (beat(r.deepest, s.floor)) r.deepest = Object.assign({ val: s.floor }, stamp);
+    if (beat(r.kills, rs.kills)) r.kills = Object.assign({ val: rs.kills }, stamp);
+    if (beat(r.level, p.level)) r.level = Object.assign({ val: p.level }, stamp);
+    if (beat(r.gold, rs.goldEarned)) r.gold = Object.assign({ val: rs.goldEarned }, stamp);
+    if (won && beat(r.fastwin, Math.round(s.time), true)) r.fastwin = Object.assign({ val: Math.round(s.time) }, stamp);
+    this.save();
   },
 
   recordKill(typeId, elite) {

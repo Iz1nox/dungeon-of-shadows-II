@@ -6,13 +6,15 @@ const Bosses = {
   spawn(bossId) {
     const s = Game.s, map = s.map;
     const def = EnemyDB.bosses[bossId];
+    const dif = Game.diff();
     const m = Enemies.floorMult(s.floor);
     const r = map.bossRoom;
+    const hp = Math.round(def.hp * m * dif.enemyHp);
     const b = {
       id: bossId, name: def.name, icon: def.icon, color: def.color,
       x: r.cx + .5, y: r.cy + .5, radius: def.radius,
-      hp: Math.round(def.hp * m), maxHp: Math.round(def.hp * m), hpGhost: 1,
-      atk: def.atk * m, def: def.def,
+      hp, maxHp: hp, hpGhost: 1,
+      atk: def.atk * m * dif.enemyAtk, def: def.def,
       xp: def.xp, gold: def.gold, essence: def.essence,
       speed: def.speed, baseSpeed: def.speed,
       ai: 'boss', element: 'phys',
@@ -38,6 +40,7 @@ const Bosses = {
 
     if (!b.taunted && b.aggro) {
       b.taunted = true;
+      Hud.bossIntro(b);
       Game.msg('💀 ' + b.name + ': „' + b.def_.taunt + '"', 'bad');
       Sfx.play('bossroar');
       Fx.shake(6);

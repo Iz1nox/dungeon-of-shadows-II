@@ -292,7 +292,7 @@ const Player = {
 
   giveGold(n) {
     const p = Game.s.p;
-    n = Math.round(n * (1 + p.d.goldPct));
+    n = Math.round(n * (1 + p.d.goldPct) * Game.diff().gold);
     p.gold += n;
     Game.s.runStats.goldEarned += n;
     if (p.gold >= 5000) Meta.unlock('rich');

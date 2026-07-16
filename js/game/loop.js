@@ -44,6 +44,10 @@ Object.assign(Game, {
     Hud.setFloorLabel();
     Music.start(s.map.biome.id);
     s.floorCleared = false;
+    s.floorSnapshot = {
+      kills: s.runStats.kills, gold: s.runStats.goldEarned,
+      items: s.runStats.itemsFound, time: s.time,
+    };
 
     // osiągnięcia głębokości
     if (floor >= 5) Meta.unlock('floor5');
@@ -62,6 +66,11 @@ Object.assign(Game, {
     const next = s.floor + 1;
     const biome = BiomeDB.forFloor(next);
     const isNewBiome = BiomeDB.forFloor(s.floor).id !== biome.id;
+    // podsumowanie ukończonego piętra
+    const fs = s.floorSnapshot, rs = s.runStats;
+    const statsHtml = fs
+      ? `Piętro ${s.floor}: &nbsp;💀 ${rs.kills - fs.kills} &nbsp;•&nbsp; 💰 ${U.fmt(rs.goldEarned - fs.gold)} &nbsp;•&nbsp; 📦 ${rs.itemsFound - fs.items} &nbsp;•&nbsp; ⏱️ ${U.timeStr(s.time - fs.time)}`
+      : '';
     Hud.floorTransition(
       'PIĘTRO ' + next,
       biome.name + (isNewBiome ? ' — ' + biome.sub : ''),
@@ -69,7 +78,7 @@ Object.assign(Game, {
         this.loadFloor(next);
         if (isNewBiome) this.msg('🌍 Wkraczasz w: ' + biome.name, 'magic');
         if (EnemyDB.bossFor(next)) this.msg('⚠️ Czujesz potężną obecność na tym piętrze...', 'bad');
-      });
+      }, statsHtml);
   },
 
   playerDeath(cause) {

@@ -49,6 +49,13 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.3.0**
+- 🎚️ poziomy trudności: Wędrowiec / Śmiałek / Koszmar (wybór na tytule, zapamiętywany)
+- 🏆 panel Rekordów (najgłębiej, najszybsze zwycięstwo, zabójstwa, poziom, złoto)
+- 📊 podsumowanie piętra na ekranie przejścia
+- 💀 filmowe intro bossów
+- 🔗 favicon + Open Graph (ładny podgląd linku)
+
 **1.2.0** *(feedback graczy)*
 - ⭐ awans nie pauzuje gry — punkty talentu kumulują się, wybór pod klawiszem **T** (Esc odkłada)
 - ⚔️ wyższa trudność: mocniejsze skalowanie wrogów, więcej ich, częstsze elity, czujniejsze aggro, wolniejsza regeneracja HP

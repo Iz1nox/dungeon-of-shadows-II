@@ -29,7 +29,7 @@ const Hud = {
     U.el('hud-kills').textContent = '💀 ' + s.runStats.kills;
     U.el('hud-gold').textContent = '💰 ' + U.fmt(p.gold);
     U.el('hud-dust').textContent = '✨ ' + U.fmt(p.dust);
-    U.el('hud-floor').textContent = '📍 ' + s.floor;
+    U.el('hud-floor').textContent = '📍 ' + s.floor + ' ' + Game.diff().icon;
 
     // niski poziom HP
     U.el('low-hp-overlay').classList.toggle('active', p.hp < d.maxHp * BAL.lowHpPct);
@@ -176,12 +176,13 @@ const Hud = {
     U.el('minimap-label').textContent = '📍 ' + s.floor + ' • ' + biome.name;
   },
 
-  floorTransition(title, sub, cb) {
+  floorTransition(title, sub, cb, statsHtml) {
     const ft = U.el('floor-transition');
     ft.style.display = 'flex';
     ft.style.opacity = '0';
     U.el('ft-title').textContent = title;
     U.el('ft-sub').textContent = sub;
+    U.el('ft-stats').innerHTML = statsHtml || '';
     ft.style.transition = 'opacity .4s';
     requestAnimationFrame(() => { ft.style.opacity = '1'; });
     setTimeout(() => {
@@ -210,9 +211,22 @@ const Hud = {
     this._achT = setTimeout(() => el.classList.remove('show'), 3500);
   },
 
+  // filmowe intro bossa przy pierwszym kontakcie
+  bossIntro(b) {
+    const el = U.el('boss-intro');
+    el.querySelector('.bi-icon').textContent = b.icon;
+    el.querySelector('.bi-name').textContent = b.name;
+    el.querySelector('.bi-taunt').textContent = '„' + b.def_.taunt + '"';
+    el.classList.add('show');
+    clearTimeout(this._biT);
+    this._biT = setTimeout(() => el.classList.remove('show'), 3000);
+  },
+
   showDeath(cause) {
     const s = Game.s, rs = s.runStats;
-    U.el('death-cause').textContent = 'Pokonał cię: ' + cause + ' — piętro ' + s.floor + ', ' + s.map.biome.name;
+    const D = Game.diff();
+    Meta.updateRecords(s, false);
+    U.el('death-cause').textContent = 'Pokonał cię: ' + cause + ' — piętro ' + s.floor + ', ' + s.map.biome.name + ' (' + D.icon + ' ' + D.name + ')';
     U.el('death-stats').innerHTML =
       `💀 Zabójstwa: ${rs.kills} (elity: ${rs.elites}) &nbsp;•&nbsp; 💰 Złoto: ${U.fmt(rs.goldEarned)}<br>` +
       `⚔️ Zadane obrażenia: ${U.fmt(rs.dmgDealt)} &nbsp;•&nbsp; 🛡️ Otrzymane: ${U.fmt(rs.dmgTaken)}<br>` +
@@ -225,9 +239,11 @@ const Hud = {
 
   showWin() {
     const s = Game.s, rs = s.runStats;
+    const D = Game.diff();
+    Meta.updateRecords(s, true);
     U.el('win-stats').innerHTML =
       `💀 Zabójstwa: ${rs.kills} (elity: ${rs.elites}) &nbsp;•&nbsp; 💰 Złoto: ${U.fmt(rs.goldEarned)}<br>` +
-      `⚔️ Zadane obrażenia: ${U.fmt(rs.dmgDealt)} &nbsp;•&nbsp; ⏱️ Czas: ${U.timeStr(s.time)} &nbsp;•&nbsp; poziom ${s.p.level}`;
+      `⚔️ Zadane obrażenia: ${U.fmt(rs.dmgDealt)} &nbsp;•&nbsp; ⏱️ Czas: ${U.timeStr(s.time)} &nbsp;•&nbsp; poziom ${s.p.level} &nbsp;•&nbsp; ${D.icon} ${D.name}`;
     const ess = Meta.addEssence(rs.essenceEarned + 150);
     U.el('win-essence').textContent = '✨ +' + ess + ' Esencji Dusz (łącznie: ' + U.fmt(Meta.data.essence) + ')';
     Meta.data.stats.wins++;
@@ -326,6 +342,35 @@ const MetaUI = {
       <h3>🏅 Osiągnięcia</h3>
       <div class="p-sub">Zdobyto ${got}/${AchievementDB.list.length}.</div>
       <div class="ach-grid">${cards}</div>`;
+  },
+
+  openRecords() {
+    const el = U.el('meta-panel');
+    el.classList.add('panel');
+    el.style.display = 'block';
+    const r = Meta.data.records, st = Meta.data.stats;
+    const defs = [
+      ['deepest', '🕳️', 'Najgłębsze zejście', v => 'piętro ' + v],
+      ['fastwin', '⚡', 'Najszybsze zwycięstwo', v => U.timeStr(v)],
+      ['kills', '💀', 'Najwięcej zabójstw (wyprawa)', v => v],
+      ['level', '🎖️', 'Najwyższy poziom', v => 'poz. ' + v],
+      ['gold', '💰', 'Najwięcej złota (wyprawa)', v => U.fmt(v)],
+    ];
+    let rows = '';
+    for (const [key, icon, name, fmt] of defs) {
+      const rec = r[key];
+      const right = rec
+        ? `<b>${fmt(rec.val)}</b><br>${ClassDB[rec.cls] ? ClassDB[rec.cls].icon : ''} ${(DIFFICULTY[rec.diff] || DIFFICULTY.normal).icon} • ${new Date(rec.when).toLocaleDateString('pl-PL')}`
+        : '<span style="color:#5a5372">— brak —</span>';
+      rows += `<div class="save-slot"><div class="ss-info"><b>${icon} ${name}</b></div>
+        <div class="ss-info" style="text-align:right">${right}</div></div>`;
+    }
+    el.innerHTML = `
+      <button class="panel-close" onclick="MetaUI.close()">✕</button>
+      <h3>🏆 Rekordy</h3>
+      <div class="p-sub">Wyprawy: ${st.runs} • Zwycięstwa: ${st.wins} • Zabójstwa łącznie: ${U.fmt(st.kills)} • Uniki: ${U.fmt(st.dashes)}</div>
+      <div class="save-slots" style="min-width:380px">${rows}</div>
+      ${!r.deepest ? '<div class="p-sub" style="margin-top:12px">Ukończ pierwszą wyprawę (albo w niej zgiń), by zapisać rekordy.</div>' : ''}`;
   },
 
   openChangelog() {

@@ -9,11 +9,17 @@ const Game = {
   keys: {},
   cam: { x: 0, y: 0 },
 
+  // aktywny poziom trudności (bezpieczny fallback na Śmiałka)
+  diff() {
+    return DIFFICULTY[this.s && this.s.difficulty] || DIFFICULTY.normal;
+  },
+
   newRunState(clsId) {
     const cls = ClassDB[clsId];
     return {
       running: true, over: false, victory: false, paused: false,
       endless: false, floor: 1, time: 0,
+      difficulty: Meta.data.difficulty || 'normal',
       map: null,
       p: this.makePlayer(cls),
       enemies: [], minions: [], projectiles: [], drops: [],

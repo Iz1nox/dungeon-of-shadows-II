@@ -26,6 +26,23 @@
     box.appendChild(card);
   }
 
+  // wybór poziomu trudności (zapamiętywany)
+  const renderDiff = () => {
+    const row = U.el('diff-row');
+    row.innerHTML = '<span class="diff-label">Trudność:</span>';
+    for (const key of ['easy', 'normal', 'hard']) {
+      const D = DIFFICULTY[key];
+      const b = document.createElement('button');
+      b.className = 'diff-btn' + (Meta.data.difficulty === key ? ' active' : '');
+      b.style.setProperty('--dc', D.color);
+      b.textContent = D.icon + ' ' + D.name;
+      b.onclick = () => { Meta.data.difficulty = key; Meta.save(); Sfx.init(); Sfx.play('click'); renderDiff(); };
+      row.appendChild(b);
+    }
+    U.el('diff-desc').textContent = DIFFICULTY[Meta.data.difficulty].desc;
+  };
+  renderDiff();
+
   // przycisk „Kontynuuj" z autozapisu
   const auto = SaveSys.slotInfo(0);
   if (auto && ClassDB[auto.cls]) {

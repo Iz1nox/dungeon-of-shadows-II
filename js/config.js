@@ -4,7 +4,7 @@
 // =============================================
 'use strict';
 
-const GAME_VERSION = '1.2.0';
+const GAME_VERSION = '1.3.0';
 const SAVE_VERSION = 1;
 const SAVE_KEY = 'dos2_save_';
 const META_KEY = 'dos2_meta';
@@ -103,6 +103,25 @@ const BAL = {
   shrineCurseChance: .22,
   mimicChance: .16,
   chestGoldBase: 26,
+};
+
+// Poziomy trudności — wybierane na ekranie tytułowym
+const DIFFICULTY = {
+  easy: {
+    id: 'easy', name: 'Wędrowiec', icon: '🌿', color: '#7ae08a',
+    desc: 'Spokojniejsza wyprawa: słabsi wrogowie, rzadsze elity. Esencja ×0,7.',
+    enemyHp: .7, enemyAtk: .72, essence: .7, gold: 1, eliteBonus: -.04,
+  },
+  normal: {
+    id: 'normal', name: 'Śmiałek', icon: '⚔️', color: '#e8c368',
+    desc: 'Otchłań taka, jaką ją zaprojektowano.',
+    enemyHp: 1, enemyAtk: 1, essence: 1, gold: 1, eliteBonus: 0,
+  },
+  hard: {
+    id: 'hard', name: 'Koszmar', icon: '💀', color: '#ff5a5a',
+    desc: 'Wrogowie +50% HP i +35% obrażeń, dużo więcej elit. Esencja ×1,6 i +15% złota.',
+    enemyHp: 1.5, enemyAtk: 1.35, essence: 1.6, gold: 1.15, eliteBonus: .08,
+  },
 };
 
 // Żywioły

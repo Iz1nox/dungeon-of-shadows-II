@@ -12,12 +12,14 @@ const Enemies = {
   make(typeId, x, y, opts = {}) {
     const def = EnemyDB.types[typeId];
     const floor = Game.s.floor;
+    const dif = Game.diff();
     const m = this.floorMult(floor) * (opts.mult || 1);
+    const hp = Math.round(def.hp * m * dif.enemyHp);
     const e = {
       id: typeId, name: def.name, icon: def.icon, color: def.color,
       x, y, radius: def.big ? .45 : .34,
-      hp: Math.round(def.hp * m), maxHp: Math.round(def.hp * m), hpGhost: 1,
-      atk: def.atk * m, def: def.def * (1 + (floor - 1) * .03),
+      hp, maxHp: hp, hpGhost: 1,
+      atk: def.atk * m * dif.enemyAtk, def: def.def * (1 + (floor - 1) * .03),
       xp: def.xp, gold: def.gold,
       speed: def.speed, baseSpeed: def.speed,
       ai: def.ai, element: def.element || 'phys',
@@ -38,7 +40,7 @@ const Enemies = {
     };
     // elita?
     if (opts.elite || (!def.noSpawn && !opts.noElite &&
-        U.chance(BAL.eliteChanceBase + floor * BAL.eliteChancePerFloor))) {
+        U.chance(BAL.eliteChanceBase + floor * BAL.eliteChancePerFloor + dif.eliteBonus))) {
       const affixId = opts.elite || U.choice(Object.keys(EnemyDB.eliteAffixes));
       e.elite = affixId;
       e.hp = Math.round(e.hp * BAL.eliteHpMult); e.maxHp = e.hp;
