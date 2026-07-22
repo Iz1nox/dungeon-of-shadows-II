@@ -3,6 +3,15 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.4.1', date: '17.07.2026', name: 'Szlify Mobilne',
+    items: [
+      '📜 Ekran tytułowy przewija się na telefonie — wszystkie przyciski (Bestiariusz, Rekordy...) są dostępne',
+      '🖥️ Tryb mobilny włącza się na każdym urządzeniu dotykowym, niezależnie od rozmiaru ekranu (naprawia nachodzące elementy w Ekwipunku i u Handlarza)',
+      '✋ Przycisk interakcji nie zasłania już paska umiejętności',
+      '🌑 Otwarte panele przyciemniają tło gry',
+    ],
+  },
+  {
     v: '1.4.0', date: '17.07.2026', name: 'Otchłań w Kieszeni',
     items: [
       '📱 <b>Pełna obsługa telefonów i tabletów</b>: wirtualny joystick, auto-celowanie w najbliższego wroga, dotykowe przyciski ataku, uniku i umiejętności',
