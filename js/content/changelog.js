@@ -3,6 +3,15 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.4.0', date: '17.07.2026', name: 'Otchłań w Kieszeni',
+    items: [
+      '📱 <b>Pełna obsługa telefonów i tabletów</b>: wirtualny joystick, auto-celowanie w najbliższego wroga, dotykowe przyciski ataku, uniku i umiejętności',
+      '🎯 Wskaźnik auto-celu — widzisz, w kogo polecą strzały',
+      '📲 Grę można zainstalować jak aplikację (PWA) i grać <b>offline</b>',
+      '🖥️ Interfejs dopasowuje się do małych ekranów (HUD, panele, ekran tytułowy)',
+    ],
+  },
+  {
     v: '1.3.0', date: '16.07.2026', name: 'Rekordy i Koszmar',
     items: [
       '🎚️ Trzy poziomy trudności do wyboru na ekranie tytułowym: <b>Wędrowiec</b> (łagodniej), <b>Śmiałek</b> i <b>Koszmar</b> (+50% HP wrogów, więcej elit, ale esencja ×1,6)',

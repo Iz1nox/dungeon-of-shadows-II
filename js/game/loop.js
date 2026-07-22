@@ -154,6 +154,7 @@ Object.assign(Game, {
 
     if (s.running && !s.over && !s.paused) {
       s.time += dt;
+      Touch.frame(dt);
       Player.update(dt);
       Minions.update(dt);
       Enemies.update(dt);

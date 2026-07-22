@@ -49,6 +49,11 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.4.0**
+- 📱 obsługa dotyku: wirtualny joystick, auto-celowanie, przyciski umiejętności
+- 📲 PWA — instalacja jak aplikacja, granie offline (service worker, network-first)
+- 🖥️ responsywny interfejs na małe ekrany
+
 **1.3.0**
 - 🎚️ poziomy trudności: Wędrowiec / Śmiałek / Koszmar (wybór na tytule, zapamiętywany)
 - 🏆 panel Rekordów (najgłębiej, najszybsze zwycięstwo, zabójstwa, poziom, złoto)

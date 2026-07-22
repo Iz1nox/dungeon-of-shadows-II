@@ -221,6 +221,18 @@ const Renderer = {
       this.drawEnemy(ctx, e, wx2sx(e.x), wy2sy(e.y), T);
     }
 
+    // wskaźnik auto-celu (sterowanie dotykowe)
+    if (Touch.enabled && Touch.target && !Touch.target.dead) {
+      const tg = Touch.target;
+      ctx.strokeStyle = 'rgba(255,220,120,.75)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath();
+      ctx.arc(wx2sx(tg.x), wy2sy(tg.y), tg.radius * T + 7 + Math.sin(this.time * 5) * 2, 0, 6.29);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
     // gracz
     this.drawPlayer(ctx, p, wx2sx(p.x), wy2sy(p.y), T);
 

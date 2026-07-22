@@ -159,6 +159,8 @@ const Player = {
       if (Game.keys['s'] || Game.keys['arrowdown']) mvy += 1;
       if (Game.keys['a'] || Game.keys['arrowleft']) mvx -= 1;
       if (Game.keys['d'] || Game.keys['arrowright']) mvx += 1;
+      // joystick dotykowy
+      if (Touch.enabled && Touch.mag > .15) { mvx = Touch.vec.x; mvy = Touch.vec.y; }
     }
     let spd = d.speed;
     if (p.dashT > 0) {
@@ -179,8 +181,8 @@ const Player = {
     // celowanie
     p.dir = U.angle(p.x, p.y, Game.mouse.wx, Game.mouse.wy);
 
-    // atak podstawowy (przytrzymanie LPM)
-    if (Game.mouse.down && !stunned && p.attackCdT <= 0 && !s.paused) this.attack();
+    // atak podstawowy (przytrzymanie LPM lub przycisku dotykowego)
+    if ((Game.mouse.down || Touch.attackHeld) && !stunned && p.attackCdT <= 0 && !s.paused) this.attack();
   },
 
   moveWithCollision(ent, nx, ny, map) {
@@ -222,6 +224,7 @@ const Player = {
     if (Game.keys['s'] || Game.keys['arrowdown']) dy += 1;
     if (Game.keys['a'] || Game.keys['arrowleft']) dx -= 1;
     if (Game.keys['d'] || Game.keys['arrowright']) dx += 1;
+    if (Touch.enabled && Touch.mag > .15) { dx = Touch.vec.x; dy = Touch.vec.y; }
     if (!dx && !dy) { dx = Math.cos(p.dir); dy = Math.sin(p.dir); }
     const len = Math.hypot(dx, dy);
     p.dashDirX = dx / len; p.dashDirY = dy / len;

@@ -87,6 +87,7 @@ const Hud = {
 
   buildSpellBar() {
     const p = Game.s.p;
+    Touch.buildSkills(p);
     const bar = U.el('spell-bar');
     bar.innerHTML = '';
     p.skills.forEach((sk, i) => {

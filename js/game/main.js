@@ -8,6 +8,12 @@
 
   Renderer.init();
   Input.init();
+  Touch.init();
+
+  // PWA: service worker → gra działa offline po pierwszej wizycie
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => { });
+  }
 
   // karty klas
   const box = U.el('class-cards');

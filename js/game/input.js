@@ -19,6 +19,10 @@ const Input = {
       m.x = e.clientX; m.y = e.clientY;
       this.updateWorldMouse();
     });
+    // wykrywanie prawdziwej myszy (laptopy dotykowe: mysz ma priorytet nad auto-celowaniem)
+    window.addEventListener('pointermove', e => {
+      if (e.pointerType === 'mouse') Game.lastMouseT = performance.now();
+    });
     cv.addEventListener('mousedown', e => {
       Sfx.init();
       if (e.button === 0) Game.mouse.down = true;
