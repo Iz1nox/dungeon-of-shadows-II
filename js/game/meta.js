@@ -42,6 +42,7 @@ const Meta = {
     d.stats = Object.assign({ kills: 0, elites: 0, dashes: 0, wins: 0, runs: 0, deepest: 0 }, d.stats);
     d.records = d.records || {};
     d.difficulty = d.difficulty || 'normal';
+    d.pacts = d.pacts || [];
     d.classesPlayed = d.classesPlayed || {};
     d.volume = d.volume !== undefined ? d.volume : .5;
     d.musicVolume = d.musicVolume !== undefined ? d.musicVolume : .3;
@@ -88,7 +89,7 @@ const Meta = {
   },
 
   addEssence(n) {
-    n = Math.round(n * (1 + this.bonuses().essencePct) * Game.diff().essence);
+    n = Math.round(n * (1 + this.bonuses().essencePct) * Game.diff().essence * Game.pactEssenceMult());
     this.data.essence += n;
     this.data.totalEssence += n;
     return n;

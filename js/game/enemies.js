@@ -21,7 +21,7 @@ const Enemies = {
       hp, maxHp: hp, hpGhost: 1,
       atk: def.atk * m * dif.enemyAtk, def: def.def * (1 + (floor - 1) * .03),
       xp: def.xp, gold: def.gold,
-      speed: def.speed, baseSpeed: def.speed,
+      speed: def.speed, baseSpeed: def.speed * (Game.hasPact('haste') ? 1.25 : 1),
       ai: def.ai, element: def.element || 'phys',
       resist: def.resist, weak: def.weak,
       statuses: {}, hitFlashT: 0,
@@ -39,8 +39,9 @@ const Enemies = {
       bobPhase: Math.random() * 6.28,
     };
     // elita?
-    if (opts.elite || (!def.noSpawn && !opts.noElite &&
-        U.chance(BAL.eliteChanceBase + floor * BAL.eliteChancePerFloor + dif.eliteBonus))) {
+    const eliteChance = (BAL.eliteChanceBase + floor * BAL.eliteChancePerFloor + dif.eliteBonus)
+      * (Game.hasPact('elite') ? 3 : 1);
+    if (opts.elite || (!def.noSpawn && !opts.noElite && U.chance(eliteChance))) {
       const affixId = opts.elite || U.choice(Object.keys(EnemyDB.eliteAffixes));
       e.elite = affixId;
       e.hp = Math.round(e.hp * BAL.eliteHpMult); e.maxHp = e.hp;
@@ -61,6 +62,7 @@ const Enemies = {
     let count = Math.min(34, 14 + Math.round(s.floor * 1.4));
     if (bossId) count = Math.round(count * .55);
     if (s.floor === FINAL_FLOOR) count = 4;
+    if (Game.hasPact('swarm')) count = Math.round(count * 1.4);
 
     for (let i = 0; i < count; i++) {
       const spot = Dungeon.freeSpot(map, 9);
@@ -168,6 +170,8 @@ const Enemies = {
       if (e.elite === 'vampiric') { e.hp = Math.min(e.maxHp, e.hp + dmg * .8); }
       // ciernie gracza
       if (p.d.thorns > 0) Combat.dealToEnemy(e, p.d.thorns, { element: 'phys' });
+      // Maska Arcymaga — odbicie części obrażeń
+      if (p.d.flags.reflect) Combat.dealToEnemy(e, dmg * p.d.flags.reflect, { element: 'arcane' });
       return true;
     }
     return false;
@@ -378,6 +382,16 @@ const Enemies = {
     Fx.burst(e.x, e.y, e.color, e.elite ? 22 : 12, { spd: 4, life: .6 });
     Fx.blood(e.x, e.y, 4);
     if (e.elite) { Fx.ring(e.x, e.y, 1.6, EnemyDB.eliteAffixes[e.elite].color, 3, .5); Fx.shake(4); }
+
+    // legendy reagujące na śmierć wroga
+    if (p.d.flags.emberNova && e.statuses.burn) {
+      Combat.explode(e.x, e.y, 2.3, p.d.atk * .8, true, 'fire', { noOnHit: true });
+    }
+    if (p.d.flags.poisonSpread && e.statuses.poison) {
+      Combat.addZone({ x: e.x, y: e.y, r: 2.2, dur: 4, dps: p.d.atk * .35,
+        friendly: true, element: 'poison', color: '#8ae05a',
+        status: { type: 'poison', dur: 3 } });
+    }
 
     // Wybuchowy elita
     if (e.elite === 'explosive') {

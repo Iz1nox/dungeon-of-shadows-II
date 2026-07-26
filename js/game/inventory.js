@@ -62,12 +62,13 @@ const Inv = {
   useConsumable(item) {
     const s = Game.s, p = s.p;
     const def = ItemDB.consumables[item.cid];
+    const pot = Game.hasPact('fasting') ? .5 : 1;   // Pakt Postu
     let used = true;
     switch (def.use) {
-      case 'heal': Player.heal(p, def.val); Sfx.play('potion'); break;
-      case 'healPct': Player.heal(p, p.d.maxHp * def.val); Sfx.play('potion'); break;
+      case 'heal': Player.heal(p, def.val * pot); Sfx.play('potion'); break;
+      case 'healPct': Player.heal(p, p.d.maxHp * def.val * pot); Sfx.play('potion'); break;
       case 'mana':
-        p.mp = Math.min(p.d.maxMp, p.mp + def.val);
+        p.mp = Math.min(p.d.maxMp, p.mp + def.val * pot);
         Fx.text(p.x, p.y - .6, '+MP', '#6a9aff', 14); Sfx.play('potion');
         break;
       case 'cleanse':
@@ -341,6 +342,7 @@ const ItemTip = {
         html += `<div class="tt-affix">◆ ${ItemDB.affixes[a.id].txt(a.val)}</div>`;
       }
       if (item.legendTxt) html += `<div class="tt-legend">★ ${item.legendTxt}</div>`;
+      if (item.setId) html += this.setHtml(item);
       if (item.flavor) html += `<div class="tt-flavor">„${item.flavor}"</div>`;
       html += this.compareHtml(item);
       html += `<div class="tt-actions">Wartość: 💰${ItemDB.sellPrice(item)} • Przetop: ✨${ItemDB.salvageValue(item)}</div>`;
@@ -353,6 +355,21 @@ const ItemTip = {
     el.style.display = 'block';
     this.move(ev);
   },
+  // opis zestawu: ile części masz i które bonusy są aktywne
+  setHtml(item) {
+    const setDef = ItemDB.sets[item.setId];
+    if (!setDef) return '';
+    const have = Game.s ? (ItemDB.setCounts(Game.s.p.equip)[item.setId] || 0) : 0;
+    const total = Object.keys(setDef.pieces).length;
+    let html = `<div class="tt-set"><div class="tt-set-name">🟩 ${U.esc(setDef.name)} (${have}/${total})</div>`;
+    for (const tier of [2, 4]) {
+      const b = setDef['bonus' + tier];
+      if (!b) continue;
+      html += `<div class="tt-set-b ${have >= tier ? 'on' : ''}">(${tier}) ${b.txt}</div>`;
+    }
+    return html + '</div>';
+  },
+
   // porównanie z założonym przedmiotem w tym slocie
   compareHtml(item) {
     if (!Game.s || item.kind !== 'equip') return '';

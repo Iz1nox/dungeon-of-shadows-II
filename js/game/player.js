@@ -3,6 +3,12 @@
 // Statystyki pochodne gracza, ruch, unik, atak podstawowy, buffy.
 const Player = {
 
+  // flagi przedmiotów, które są w istocie zwykłymi statystykami (reszta → d.flags)
+  STAT_KEYS: new Set(['atk', 'hp', 'mp', 'def', 'crit', 'critDmg', 'atkPct', 'spdPct',
+    'spellPct', 'lifesteal', 'dodge', 'mpRegen', 'hpRegen', 'goldPct', 'xpPct', 'cdr',
+    'thorns', 'luck', 'burnHit', 'poisonHit', 'iceHit', 'minionMax', 'extraDash',
+    'hpPct', 'defFlat']),
+
   // Zbiera: bazę klasy + poziom + ekwipunek + talenty + metę + buffy → p.d
   recalc(p) {
     const cls = ClassDB[p.cls];
@@ -65,15 +71,29 @@ const Player = {
       for (const k in it.stats) addStat(k, Math.round(it.stats[k] * plusMult));
       for (const a of it.affixes) addStat(ItemDB.affixes[a.id].key, a.val);
       for (const f in it.flags) {
-        if (f === 'shadowHit') d.shadowHit += it.flags[f];
-        else if (f === 'minionMax') d.minionMax += it.flags[f];
-        else if (f === 'minionDmg') d.minionDmg += it.flags[f];
-        else if (f === 'extraDash') d.dashMax += it.flags[f];
-        else if (f === 'spdPct') d.spdPct += it.flags[f];
-        else if (f === 'hpPct') d.hpPct += it.flags[f];
-        else if (f === 'dodge') d.dodge += it.flags[f];
-        else d.flags[f] = (d.flags[f] || 0) + it.flags[f];
+        const v = it.flags[f];
+        if (f === 'shadowHit') d.shadowHit += v;
+        else if (f === 'minionDmg') d.minionDmg += v;
+        else if (this.STAT_KEYS.has(f)) addStat(f, v);   // flaga będąca zwykłą statystyką
+        else d.flags[f] = (d.flags[f] || 0) + v;         // efekt specjalny
       }
+    }
+
+    // bonusy zestawów (2 i 4 części)
+    const setCounts = ItemDB.setCounts(p.equip);
+    d.setCounts = setCounts;
+    for (const sid in setCounts) {
+      const setDef = ItemDB.sets[sid];
+      if (!setDef) continue;
+      const n = setCounts[sid];
+      for (const tier of [2, 4]) {
+        if (n < tier) continue;
+        const bonus = setDef['bonus' + tier];
+        if (!bonus) continue;
+        if (bonus.mod) for (const k in bonus.mod) addStat(k, bonus.mod[k]);
+        if (bonus.flag) for (const f in bonus.flag) d.flags[f] = (d.flags[f] || 0) + bonus.flag[f];
+      }
+      if (n >= 4) Meta.unlock('full_set');
     }
 
     // talenty
@@ -103,6 +123,7 @@ const Player = {
     if (d.flags.berserk && p.hp !== undefined && p.hp < d.maxHp * .35) d.atkPct += d.flags.berserk;
 
     d.maxHp = Math.round(d.maxHp * (1 + d.hpPct));
+    if (Game.hasPact('frail')) d.maxHp = Math.max(10, Math.round(d.maxHp * .7));
     d.atk = d.atk * (1 + d.atkPct);
     d.speed = Math.max(1.2, d.speed * (1 + d.spdPct));
     d.spellPower = 1 + d.spellPower + d.spellPct;
@@ -236,6 +257,10 @@ const Player = {
     if (Meta.data.stats.dashes >= 100) Meta.unlock('dash100');
     Sfx.play('dash');
     Fx.ring(p.x, p.y, .9, '#4adfff', 2, .3);
+    // Łachy Cienioskoczka (4 części) — unik zostawia wybuch cienia
+    if (p.d.flags.setShadowBurst) {
+      Combat.explode(p.x, p.y, 2.2, p.d.atk * .9, true, 'shadow', { noOnHit: true });
+    }
   },
 
   attack() {

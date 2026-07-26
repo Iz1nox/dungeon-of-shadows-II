@@ -4,7 +4,7 @@
 // =============================================
 'use strict';
 
-const GAME_VERSION = '1.4.1';
+const GAME_VERSION = '1.5.0';
 const SAVE_VERSION = 1;
 const SAVE_KEY = 'dos2_save_';
 const META_KEY = 'dos2_meta';
@@ -34,11 +34,13 @@ const TILE = {
   ICE: 11,
   DOOR: 12,
   VOID: 13,
+  CHALLENGE: 14,
 };
 
 // Kafelki, po których można chodzić
 const WALKABLE = new Set([TILE.FLOOR, TILE.STAIRS, TILE.SHRINE, TILE.ALTAR, TILE.WELL,
-  TILE.SHOP, TILE.SPIKES, TILE.LAVA, TILE.POISON, TILE.ICE, TILE.DOOR, TILE.CHEST]);
+  TILE.SHOP, TILE.SPIKES, TILE.LAVA, TILE.POISON, TILE.ICE, TILE.DOOR, TILE.CHEST,
+  TILE.CHALLENGE]);
 
 // Centralny balans
 const BAL = {
@@ -103,6 +105,11 @@ const BAL = {
   shrineCurseChance: .22,
   mimicChance: .16,
   chestGoldBase: 26,
+
+  // arena wyzwania
+  challengeChance: .6,
+  challengeWaves: 3,
+  challengeEssence: 12,
 };
 
 // Poziomy trudności — wybierane na ekranie tytułowym
@@ -121,6 +128,35 @@ const DIFFICULTY = {
     id: 'hard', name: 'Koszmar', icon: '💀', color: '#ff5a5a',
     desc: 'Wrogowie +50% HP i +35% obrażeń, dużo więcej elit. Esencja ×1,6 i +15% złota.',
     enemyHp: 1.5, enemyAtk: 1.35, essence: 1.6, gold: 1.15, eliteBonus: .08,
+  },
+};
+
+// Pakty Otchłani — dobrowolne utrudnienia wybierane przed wyprawą.
+// Każdy podnosi mnożnik zdobywanej Esencji Dusz.
+const PACTS = {
+  swarm: {
+    id: 'swarm', name: 'Pakt Roju', short: 'Rój', icon: '🐝', essence: .25,
+    desc: 'Na każdym piętrze czyha o 40% więcej wrogów.',
+  },
+  frail: {
+    id: 'frail', name: 'Pakt Kruchości', short: 'Kruchość', icon: '💔', essence: .3,
+    desc: 'Twoje maksymalne zdrowie jest niższe o 30%.',
+  },
+  haste: {
+    id: 'haste', name: 'Pakt Pośpiechu', short: 'Pośpiech', icon: '💨', essence: .2,
+    desc: 'Wrogowie poruszają się o 25% szybciej.',
+  },
+  elite: {
+    id: 'elite', name: 'Pakt Elit', short: 'Elity', icon: '👑', essence: .35,
+    desc: 'Trzykrotnie większa szansa na elitarnych przeciwników.',
+  },
+  fasting: {
+    id: 'fasting', name: 'Pakt Postu', short: 'Post', icon: '🚫', essence: .2,
+    desc: 'Mikstury przywracają o połowę mniej.',
+  },
+  poverty: {
+    id: 'poverty', name: 'Pakt Nędzy', short: 'Nędza', icon: '🕯️', essence: .25,
+    desc: 'Wędrowny Handlarz nie zejdzie tak głęboko — brak sklepów.',
   },
 };
 

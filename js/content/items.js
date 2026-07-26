@@ -10,6 +10,51 @@ const ItemDB = {
     rare:   { name: 'Rzadki', color: '#ffd84d', affixes: [2, 3], mult: 1.25 },
     epic:   { name: 'Epicki', color: '#c05aff', affixes: [3, 4], mult: 1.42 },
     legend: { name: 'Legendarny', color: '#ff8c2e', affixes: [2, 3], mult: 1.6 },
+    set:    { name: 'Zestawowy', color: '#3ddc84', affixes: [2, 2], mult: 1.5 },
+  },
+
+  // ===== ZESTAWY (sety) =====
+  // Bonusy naliczane przy 2 i 4 założonych częściach.
+  sets: {
+    hero: {
+      id: 'hero', name: 'Dziedzictwo Pierwszego Bohatera', color: '#3ddc84',
+      flavor: 'Zbroja tego, kto dziesięć lat temu zamknął Otchłań.',
+      pieces: {
+        weapon: { name: 'Miecz Pierwszego Bohatera', icon: '⚔️' },
+        helmet: { name: 'Hełm Pierwszego Bohatera', icon: '🪖' },
+        armor:  { name: 'Zbroja Pierwszego Bohatera', icon: '🛡️' },
+        boots:  { name: 'Buty Pierwszego Bohatera', icon: '🥾' },
+      },
+      bonus2: { txt: '+12% maks. HP, +5 pancerza', mod: { hpPct: .12, def: 5 } },
+      bonus4: { txt: 'raz na piętro śmiertelny cios zostawia cię z 1 HP i 3s nietykalności',
+                flag: { setHeroGuard: 1 } },
+    },
+    cult: {
+      id: 'cult', name: 'Regalia Otchłannego Kultu', color: '#3ddc84',
+      flavor: 'Kultyści nosili je, nim Serce przemówiło im do głów.',
+      pieces: {
+        weapon: { name: 'Kostur Otchłannego Kultu', icon: '🪄' },
+        helmet: { name: 'Kaptur Otchłannego Kultu', icon: '🎩' },
+        amulet: { name: 'Amulet Otchłannego Kultu', icon: '📿' },
+        ring:   { name: 'Pierścień Otchłannego Kultu', icon: '💍' },
+      },
+      bonus2: { txt: '+18% mocy umiejętności, +25 maks. MP', mod: { spellPct: .18, mp: 25 } },
+      bonus4: { txt: '-15% odnowień; 20% szans, że umiejętność nie zużyje many',
+                mod: { cdr: .15 }, flag: { setCultFocus: .2 } },
+    },
+    shadow: {
+      id: 'shadow', name: 'Łachy Cienioskoczka', color: '#3ddc84',
+      flavor: 'Lekkie jak szept. Znalezione tam, gdzie nie było ciała.',
+      pieces: {
+        weapon: { name: 'Sztylet Cienioskoczka', icon: '🗡️' },
+        armor:  { name: 'Kurta Cienioskoczka', icon: '🧥' },
+        boots:  { name: 'Buty Cienioskoczka', icon: '👢' },
+        ring:   { name: 'Obręcz Cienioskoczka', icon: '⭕' },
+      },
+      bonus2: { txt: '+8% szybkości ruchu, +7% uniku', mod: { spdPct: .08, dodge: .07 } },
+      bonus4: { txt: '+1 ładunek uniku; unik zostawia wybuch cienia',
+                mod: { extraDash: 1 }, flag: { setShadowBurst: 1 } },
+    },
   },
 
   bases: {
@@ -126,6 +171,37 @@ const ItemDB = {
       stats: {}, affixIds: ['dodge', 'crit'],
       flag: { dodgeBlast: 1, dodge: .06 }, legendTxt: '+6% uniku; unik wywołuje arkaniczny wybuch',
       flavor: 'Odbija więcej niż światło.' },
+
+    // ===== ŁUPY BOSSÓW (nie wypadają z żadnego innego źródła) =====
+    { id: 'leg_warden_bones', slot: 'armor', name: 'Kościana Egida Strażnika', icon: '🦴',
+      bossOnly: true, stats: { def: 1.45 }, affixIds: ['hp', 'thorns'],
+      flag: { thorns: 12, hpPct: .1 }, legendTxt: 'odbija 12 obrażeń i daje +10% maks. HP',
+      flavor: 'Strażnik pilnował krypty tak długo, że sam stał się jej ścianą.' },
+    { id: 'leg_spore_crown', slot: 'helmet', name: 'Korona Zarodników', icon: '🍄',
+      bossOnly: true, stats: { def: 1.2 }, affixIds: ['hp', 'poisonHit'],
+      flag: { poisonHit: .3, poisonSpread: 1 },
+      legendTxt: '+30% szansy na zatrucie; zabity zatruty wróg wypuszcza chmurę jadu',
+      flavor: 'Wciąż kiełkuje. Lepiej jej nie zdejmować w nocy.' },
+    { id: 'leg_tyrant_blade', slot: 'weapon', name: 'Ostrze Lodowego Tyrana', icon: '🗡️',
+      bossOnly: true, stats: { atk: 1.4 }, affixIds: ['iceHit', 'critDmg'],
+      flag: { iceHit: .35, shatter: .25 },
+      legendTxt: '+35% szansy na spowolnienie; +25% obrażeń zmarzniętym celom',
+      flavor: 'Nie topi się. Czeka na twoje dłonie.' },
+    { id: 'leg_ash_heart', slot: 'amulet', name: 'Serce Popiołów', icon: '🧿',
+      bossOnly: true, stats: {}, affixIds: ['atkPct', 'hp'],
+      flag: { burnHit: .3, emberNova: 1 },
+      legendTxt: '+30% szansy na podpalenie; płonący wróg umierając eksploduje',
+      flavor: 'Bije wolniej niż twoje, ale nigdy nie stygnie.' },
+    { id: 'leg_mirror_face', slot: 'helmet', name: 'Maska Arcymaga', icon: '🪞',
+      bossOnly: true, stats: { def: 1.15 }, affixIds: ['spell', 'mp'],
+      flag: { spellPct: .2, reflect: .15 },
+      legendTxt: '+20% mocy umiejętności; 15% obrażeń wraca do napastnika',
+      flavor: 'Widzisz w niej siebie sprzed wyprawy.' },
+    { id: 'leg_heart_shard', slot: 'ring', name: 'Odłamek Serca Otchłani', icon: '💗',
+      bossOnly: true, stats: { atk: 1.3 }, affixIds: ['lifesteal', 'critDmg'],
+      flag: { lifesteal: .05, hpPct: .12 },
+      legendTxt: '+5% kradzieży życia i +12% maks. HP',
+      flavor: 'Wciąż bije. Teraz w rytm twojego.' },
   ],
 
   // ===== KONSUMENTY =====
@@ -157,6 +233,7 @@ const ItemDB = {
       ['magic', 32 + f * .4],
       ['rare', 6 + f * 1.1],
       ['epic', Math.max(0, f - 3) * .8],
+      ['set', Math.max(0, f - 4) * .55],
       ['legend', Math.max(0, f - 5) * .33],
     ];
     let total = 0; for (const [, v] of w) total += v;
@@ -185,6 +262,15 @@ const ItemDB = {
       if (item) return item;
       rarity = 'epic';
     }
+    if (rarity === 'set') {
+      // wybierz zestaw, który w ogóle ma taki slot
+      const withSlot = Object.values(this.sets).filter(s => s.pieces[slot]);
+      const item = withSlot.length
+        ? this.makeSetPiece(floor, U.choice(withSlot).id, slot)
+        : this.makeSetPiece(floor);
+      if (item) return item;
+      rarity = 'epic';
+    }
     const lvl = this.itemLvl(floor);
     const rar = this.rarities[rarity];
     const base = U.choice(this.bases[slot]);
@@ -205,9 +291,18 @@ const ItemDB = {
   },
 
   makeLegend(floor, slot) {
-    const cands = this.legends.filter(l => !slot || l.slot === slot);
+    const cands = this.legends.filter(l => !l.bossOnly && (!slot || l.slot === slot));
     if (!cands.length) return null;
-    const def = U.choice(cands);
+    return this.buildLegend(U.choice(cands), floor);
+  },
+
+  // konkretna legenda po id (łupy bossów)
+  makeLegendById(id, floor) {
+    const def = this.legends.find(l => l.id === id);
+    return def ? this.buildLegend(def, floor) : null;
+  },
+
+  buildLegend(def, floor) {
     const lvl = this.itemLvl(floor);
     const stats = this.baseStats(def.slot, lvl, this.rarities.legend.mult);
     for (const k in def.stats) stats[k] = Math.round((stats[k] || lvl * 2) * def.stats[k]);
@@ -217,6 +312,28 @@ const ItemDB = {
       name: def.name, rarity: 'legend', lvl, plus: 0,
       stats, affixes, flags: Object.assign({}, def.flag),
       legendTxt: def.legendTxt, flavor: def.flavor, legendId: def.id,
+    };
+  },
+
+  // ===== CZĘŚCI ZESTAWÓW =====
+  makeSetPiece(floor, setId, slot) {
+    const setDef = setId ? this.sets[setId] : U.choice(Object.values(this.sets));
+    if (!setDef) return null;
+    const slots = Object.keys(setDef.pieces);
+    const useSlot = slot && setDef.pieces[slot] ? slot : U.choice(slots);
+    const piece = setDef.pieces[useSlot];
+    const lvl = this.itemLvl(floor);
+    const rar = this.rarities.set;
+    const pool = U.shuffle(this.slotAffixes[useSlot]);
+    const affixes = [];
+    for (let i = 0; i < 2 && i < pool.length; i++) {
+      affixes.push({ id: pool[i], val: this.affixes[pool[i]].roll(lvl) });
+    }
+    return {
+      uid: this.uid++, kind: 'equip', slot: useSlot, base: 'set_' + setDef.id, icon: piece.icon,
+      name: piece.name, rarity: 'set', lvl, plus: 0,
+      stats: this.baseStats(useSlot, lvl, rar.mult),
+      affixes, flags: {}, setId: setDef.id, flavor: setDef.flavor,
     };
   },
 
@@ -240,7 +357,7 @@ const ItemDB = {
 
   price(item) {
     if (item.kind === 'consumable') return this.consumables[item.cid].price;
-    const rMult = { common: 1, magic: 2.2, rare: 4.5, epic: 9, legend: 18 }[item.rarity];
+    const rMult = { common: 1, magic: 2.2, rare: 4.5, epic: 9, set: 12, legend: 18 }[item.rarity] || 1;
     return Math.round((14 + item.lvl * 9) * rMult + item.plus * 25);
   },
 
@@ -255,7 +372,17 @@ const ItemDB = {
   },
 
   salvageValue(item) {
-    const rMult = { common: 1, magic: 2, rare: 4, epic: 8, legend: 15 }[item.rarity];
+    const rMult = { common: 1, magic: 2, rare: 4, epic: 8, set: 10, legend: 15 }[item.rarity] || 1;
     return Math.max(2, Math.round((3 + item.lvl * 1.2) * rMult + item.plus * 6));
+  },
+
+  // ile części każdego zestawu jest założonych
+  setCounts(equip) {
+    const counts = {};
+    for (const slot in equip) {
+      const it = equip[slot];
+      if (it && it.setId) counts[it.setId] = (counts[it.setId] || 0) + 1;
+    }
+    return counts;
   },
 };

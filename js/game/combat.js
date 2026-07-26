@@ -33,6 +33,7 @@ const Combat = {
 
     // flagi warunkowe
     if (d.flags.coldBlood && (e.statuses.chill || e.statuses.freeze)) dmg *= 1 + d.flags.coldBlood;
+    if (d.flags.shatter && (e.statuses.chill || e.statuses.freeze)) dmg *= 1 + d.flags.shatter;
     if (d.flags.executioner && e.hp < e.maxHp * .3) dmg *= 1 + d.flags.executioner;
     if (d.flags.fullHpDmg && e.hp >= e.maxHp * .999) dmg *= 1 + d.flags.fullHpDmg;
 
@@ -141,6 +142,17 @@ const Combat = {
     Sfx.play('hurt');
 
     if (p.hp <= 0) {
+      // Dziedzictwo Pierwszego Bohatera (4 części) — raz na piętro
+      if (p.d.flags.setHeroGuard && !p.heroGuardUsed) {
+        p.heroGuardUsed = true;
+        p.hp = 1;
+        p.iframesT = 3;
+        Fx.ring(p.x, p.y, 3, '#3ddc84', 4, .6);
+        Fx.flash('#3ddc84', .28);
+        Sfx.play('buff');
+        Game.msg('🛡️ Dziedzictwo Bohatera: przeżywasz z 1 HP! (3s nietykalności)', 'good');
+        return;
+      }
       // Pierścień Feniksa — raz na piętro
       if (p.d.flags.phoenix && !p.phoenixFloorUsed) {
         p.phoenixFloorUsed = true;

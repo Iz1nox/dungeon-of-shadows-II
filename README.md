@@ -49,6 +49,18 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.5.0**
+- 🩸 Pakty Otchłani — 6 dobrowolnych utrudnień za mnożnik Esencji
+- 🟩 3 zestawy przedmiotów z bonusami za 2 i 4 części
+- 🌟 unikalne relikwie bossów (6 nowych legend)
+- ⚔️ Areny Otchłani — 3 fale wrogów za gwarantowany łup
+- 🏅 3 nowe osiągnięcia; poprawka mapowania flag legend na statystyki
+
+**1.4.1**
+- 📜 przewijalny ekran tytułowy i tryb kompaktowy na niskich ekranach
+- 🖥️ tryb mobilny na każdym urządzeniu dotykowym (`pointer:coarse`)
+- ✋ przycisk interakcji nie koliduje z paskiem umiejętności
+
 **1.4.0**
 - 📱 obsługa dotyku: wirtualny joystick, auto-celowanie, przyciski umiejętności
 - 📲 PWA — instalacja jak aplikacja, granie offline (service worker, network-first)

@@ -11,6 +11,8 @@ const SaveSys = {
       when: Date.now(),
       floor: s.floor, endless: s.endless, time: s.time,
       difficulty: s.difficulty || 'normal',
+      pacts: s.pacts || [],
+      challenge: s.challenge || null,
       runStats: s.runStats,
       shopStock: s.shopStock,
       player: {
@@ -20,6 +22,7 @@ const SaveSys = {
         talents: p.talents, talentPoints: p.talentPoints || 0, altarBonus: p.altarBonus || 0,
         equip: p.equip, inv: p.inv.map(item),
         phoenixFloorUsed: p.phoenixFloorUsed, metaReviveUsed: p.metaReviveUsed,
+        heroGuardUsed: p.heroGuardUsed,
         dashCharges: p.dashCharges,
       },
       map: {
@@ -31,6 +34,7 @@ const SaveSys = {
       },
       enemies: s.enemies.filter(e => !e.dead && !e.isBoss && !e.summonedBy).map(e => ({
         id: e.id, x: e.x, y: e.y, hp: e.hp, elite: e.elite, aggro: e.aggro,
+        ch: e.fromChallenge || undefined,
       })),
       boss: s.boss && !s.boss.dead ? { id: s.boss.id, hp: s.boss.hp, phase: s.boss.phase } : null,
       drops: s.drops,
@@ -82,6 +86,8 @@ const SaveSys = {
     Game.s = s;
     s.floor = d.floor; s.endless = !!d.endless; s.time = d.time || 0;
     s.difficulty = d.difficulty || 'normal';
+    s.pacts = d.pacts || [];
+    s.challenge = d.challenge || null;
     s.runStats = Object.assign(s.runStats, d.runStats);
     s.shopStock = d.shopStock || null;
 
@@ -110,6 +116,7 @@ const SaveSys = {
     p.inv = dp.inv || [];
     p.phoenixFloorUsed = !!dp.phoenixFloorUsed;
     p.metaReviveUsed = !!dp.metaReviveUsed;
+    p.heroGuardUsed = !!dp.heroGuardUsed;
     p.dashCharges = dp.dashCharges !== undefined ? dp.dashCharges : BAL.dashChargesBase;
     Player.recalc(p);
     p.hp = Math.min(dp.hp, p.d.maxHp);
@@ -121,6 +128,7 @@ const SaveSys = {
       const e = Enemies.make(ed.id, ed.x, ed.y, { elite: ed.elite || undefined, noElite: !ed.elite });
       e.hp = Math.min(ed.hp, e.maxHp);
       e.aggro = !!ed.aggro;
+      if (ed.ch) e.fromChallenge = true;
       s.enemies.push(e);
     }
     if (d.boss && EnemyDB.bosses[d.boss.id]) {

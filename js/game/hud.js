@@ -212,6 +212,22 @@ const Hud = {
     this._achT = setTimeout(() => el.classList.remove('show'), 3500);
   },
 
+  // lista paktów zawartych w tej wyprawie (na ekranach końcowych)
+  pactLine(s) {
+    const act = (s.pacts || []).filter(k => PACTS[k]);
+    if (!act.length) return '';
+    return `<br><span style="color:#ff8aa0">🩸 Pakty: ${act.map(k => PACTS[k].icon + ' ' + (PACTS[k].short || PACTS[k].name)).join(', ')}`
+      + ` (✨ ×${Game.pactEssenceMult().toFixed(2).replace('.', ',')})</span>`;
+  },
+
+  // pasek postępu areny (wave=0 chowa)
+  challengeBanner(wave, total) {
+    const el = U.el('challenge-banner');
+    if (!wave) { el.classList.remove('show'); return; }
+    el.innerHTML = `⚔️ ARENA OTCHŁANI <b>${wave}/${total}</b>`;
+    el.classList.add('show');
+  },
+
   // filmowe intro bossa przy pierwszym kontakcie
   bossIntro(b) {
     const el = U.el('boss-intro');
@@ -227,11 +243,13 @@ const Hud = {
     const s = Game.s, rs = s.runStats;
     const D = Game.diff();
     Meta.updateRecords(s, false);
+    if ((s.pacts || []).length >= 3) Meta.unlock('pact3');
     U.el('death-cause').textContent = 'Pokonał cię: ' + cause + ' — piętro ' + s.floor + ', ' + s.map.biome.name + ' (' + D.icon + ' ' + D.name + ')';
     U.el('death-stats').innerHTML =
       `💀 Zabójstwa: ${rs.kills} (elity: ${rs.elites}) &nbsp;•&nbsp; 💰 Złoto: ${U.fmt(rs.goldEarned)}<br>` +
       `⚔️ Zadane obrażenia: ${U.fmt(rs.dmgDealt)} &nbsp;•&nbsp; 🛡️ Otrzymane: ${U.fmt(rs.dmgTaken)}<br>` +
-      `⏱️ Czas: ${U.timeStr(s.time)} &nbsp;•&nbsp; 🧪 Mikstury: ${rs.potionsUsed} &nbsp;•&nbsp; 📦 Przedmioty: ${rs.itemsFound}`;
+      `⏱️ Czas: ${U.timeStr(s.time)} &nbsp;•&nbsp; 🧪 Mikstury: ${rs.potionsUsed} &nbsp;•&nbsp; 📦 Przedmioty: ${rs.itemsFound}` +
+      (rs.arenas ? `<br>⚔️ Areny Otchłani: ${rs.arenas}` : '') + this.pactLine(s);
     const ess = Meta.addEssence(rs.essenceEarned + s.floor * BAL.essenceFloorBonus);
     U.el('death-essence').textContent = '✨ +' + ess + ' Esencji Dusz (łącznie: ' + U.fmt(Meta.data.essence) + ')';
     Meta.save();
@@ -242,9 +260,11 @@ const Hud = {
     const s = Game.s, rs = s.runStats;
     const D = Game.diff();
     Meta.updateRecords(s, true);
+    if ((s.pacts || []).length >= 3) Meta.unlock('pact3');
     U.el('win-stats').innerHTML =
       `💀 Zabójstwa: ${rs.kills} (elity: ${rs.elites}) &nbsp;•&nbsp; 💰 Złoto: ${U.fmt(rs.goldEarned)}<br>` +
-      `⚔️ Zadane obrażenia: ${U.fmt(rs.dmgDealt)} &nbsp;•&nbsp; ⏱️ Czas: ${U.timeStr(s.time)} &nbsp;•&nbsp; poziom ${s.p.level} &nbsp;•&nbsp; ${D.icon} ${D.name}`;
+      `⚔️ Zadane obrażenia: ${U.fmt(rs.dmgDealt)} &nbsp;•&nbsp; ⏱️ Czas: ${U.timeStr(s.time)} &nbsp;•&nbsp; poziom ${s.p.level} &nbsp;•&nbsp; ${D.icon} ${D.name}` +
+      this.pactLine(s);
     const ess = Meta.addEssence(rs.essenceEarned + 150);
     U.el('win-essence').textContent = '✨ +' + ess + ' Esencji Dusz (łącznie: ' + U.fmt(Meta.data.essence) + ')';
     Meta.data.stats.wins++;

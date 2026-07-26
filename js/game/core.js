@@ -14,23 +14,41 @@ const Game = {
     return DIFFICULTY[this.s && this.s.difficulty] || DIFFICULTY.normal;
   },
 
+  // czy w tej wyprawie zawarto dany Pakt Otchłani
+  hasPact(id) {
+    return !!(this.s && this.s.pacts && this.s.pacts.includes(id));
+  },
+
+  // łączny mnożnik Esencji z zawartych paktów
+  pactEssenceMult() {
+    if (!this.s || !this.s.pacts) return 1;
+    let m = 1;
+    for (const id of this.s.pacts) if (PACTS[id]) m += PACTS[id].essence;
+    return m;
+  },
+
   newRunState(clsId) {
     const cls = ClassDB[clsId];
-    return {
+    const s = {
       running: true, over: false, victory: false, paused: false,
       endless: false, floor: 1, time: 0,
       difficulty: Meta.data.difficulty || 'normal',
+      pacts: (Meta.data.pacts || []).slice(),
       map: null,
-      p: this.makePlayer(cls),
+      p: null,
       enemies: [], minions: [], projectiles: [], drops: [],
       zones: [], telegraphs: [], traps: [],
       boss: null, bossDefeated: false, bossHitTaken: false,
       combo: { count: 0, timer: 0 },
       runStats: {
         kills: 0, elites: 0, goldEarned: 0, dmgDealt: 0, dmgTaken: 0,
-        potionsUsed: 0, essenceEarned: 0, itemsFound: 0, startTime: Date.now(),
+        potionsUsed: 0, essenceEarned: 0, itemsFound: 0, arenas: 0, startTime: Date.now(),
       },
     };
+    // stan musi być widoczny (pakty, trudność), zanim policzymy statystyki bohatera
+    this.s = s;
+    s.p = this.makePlayer(cls);
+    return s;
   },
 
   makePlayer(cls) {

@@ -11,7 +11,8 @@ const Events = {
       for (let dx = -1; dx <= 1; dx++) {
         const x = px + dx, y = py + dy;
         const t = Dungeon.tile(s.map, x, y);
-        if ([TILE.STAIRS, TILE.CHEST, TILE.SHRINE, TILE.ALTAR, TILE.WELL, TILE.SHOP].includes(t)) {
+        if ([TILE.STAIRS, TILE.CHEST, TILE.SHRINE, TILE.ALTAR, TILE.WELL, TILE.SHOP,
+             TILE.CHALLENGE].includes(t)) {
           // środek kafelka musi być blisko
           if (U.dist(p.x, p.y, x + .5, y + .5) < 1.35) return { x, y, t };
         }
@@ -27,6 +28,7 @@ const Events = {
       case TILE.ALTAR: return '<b>E</b> — Ołtarz Krwi 🩸 (−20% HP → +3 ataku)';
       case TILE.WELL: return '<b>E</b> — Studnia Dusz 💧';
       case TILE.SHOP: return '<b>E</b> — handluj 🧙';
+      case TILE.CHALLENGE: return '<b>E</b> — Arena Otchłani ⚔️ (' + BAL.challengeWaves + ' fale, pewny łup)';
       default: return '';
     }
   },
@@ -42,6 +44,7 @@ const Events = {
       case TILE.ALTAR: this.useAltar(it.x, it.y); break;
       case TILE.WELL: this.useWell(it.x, it.y); break;
       case TILE.SHOP: Shop.open(); break;
+      case TILE.CHALLENGE: Challenge.start(it.x, it.y); break;
     }
   },
 

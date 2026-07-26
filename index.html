@@ -14,7 +14,7 @@
 <meta property="og:url" content="https://bibliotekabobrzyce.pl/dos2/">
 <meta property="og:image" content="https://bibliotekabobrzyce.pl/dos2/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="css/styles.css?v=141">
+<link rel="stylesheet" href="css/styles.css?v=150">
 </head>
 <body>
 
@@ -39,6 +39,8 @@
   <div class="class-cards" id="class-cards"></div>
   <div class="diff-row" id="diff-row"></div>
   <div class="diff-desc" id="diff-desc"></div>
+  <div class="diff-row pact-row" id="pact-row"></div>
+  <div class="diff-desc pact-desc" id="pact-desc"></div>
   <div class="title-buttons" id="title-buttons">
     <button onclick="Game.loadFromTitle()">📂 Wczytaj zapis</button>
     <button onclick="MetaUI.open()">🔮 Sanktuarium Dusz</button>
@@ -111,6 +113,7 @@
   <div id="achievement-toast"></div>
   <div id="interact-hint"></div>
   <div id="talent-hint" onclick="Progression.showTalentChoice()"></div>
+  <div id="challenge-banner"></div>
   <div id="touch-controls">
     <div id="tc-joyzone"><div id="tc-joy"><div id="tc-knob"></div></div></div>
     <div id="tc-interact" class="tc-btn">✋</div>
@@ -143,37 +146,38 @@
 <div id="map-overlay"><canvas id="bigmap"></canvas><div class="map-hint">Tab / Esc — zamknij</div></div>
 
 <!-- ============ SKRYPTY ============ -->
-<script src="js/config.js?v=141"></script>
-<script src="js/util.js?v=141"></script>
-<script src="js/audio.js?v=141"></script>
-<script src="js/content/biomes.js?v=141"></script>
-<script src="js/content/classes.js?v=141"></script>
-<script src="js/content/enemies.js?v=141"></script>
-<script src="js/content/items.js?v=141"></script>
-<script src="js/content/talents.js?v=141"></script>
-<script src="js/content/achievements.js?v=141"></script>
-<script src="js/content/changelog.js?v=141"></script>
-<script src="js/engine/dungeon.js?v=141"></script>
-<script src="js/engine/fov.js?v=141"></script>
-<script src="js/engine/pathfind.js?v=141"></script>
-<script src="js/engine/particles.js?v=141"></script>
-<script src="js/game/meta.js?v=141"></script>
-<script src="js/game/core.js?v=141"></script>
-<script src="js/game/player.js?v=141"></script>
-<script src="js/game/combat.js?v=141"></script>
-<script src="js/game/skills.js?v=141"></script>
-<script src="js/game/enemies.js?v=141"></script>
-<script src="js/game/bosses.js?v=141"></script>
-<script src="js/game/inventory.js?v=141"></script>
-<script src="js/game/events.js?v=141"></script>
-<script src="js/game/shop.js?v=141"></script>
-<script src="js/game/progression.js?v=141"></script>
-<script src="js/game/save.js?v=141"></script>
-<script src="js/game/render.js?v=141"></script>
-<script src="js/game/hud.js?v=141"></script>
-<script src="js/game/input.js?v=141"></script>
-<script src="js/game/touch.js?v=141"></script>
-<script src="js/game/loop.js?v=141"></script>
-<script src="js/game/main.js?v=141"></script>
+<script src="js/config.js?v=150"></script>
+<script src="js/util.js?v=150"></script>
+<script src="js/audio.js?v=150"></script>
+<script src="js/content/biomes.js?v=150"></script>
+<script src="js/content/classes.js?v=150"></script>
+<script src="js/content/enemies.js?v=150"></script>
+<script src="js/content/items.js?v=150"></script>
+<script src="js/content/talents.js?v=150"></script>
+<script src="js/content/achievements.js?v=150"></script>
+<script src="js/content/changelog.js?v=150"></script>
+<script src="js/engine/dungeon.js?v=150"></script>
+<script src="js/engine/fov.js?v=150"></script>
+<script src="js/engine/pathfind.js?v=150"></script>
+<script src="js/engine/particles.js?v=150"></script>
+<script src="js/game/meta.js?v=150"></script>
+<script src="js/game/core.js?v=150"></script>
+<script src="js/game/player.js?v=150"></script>
+<script src="js/game/combat.js?v=150"></script>
+<script src="js/game/skills.js?v=150"></script>
+<script src="js/game/enemies.js?v=150"></script>
+<script src="js/game/bosses.js?v=150"></script>
+<script src="js/game/inventory.js?v=150"></script>
+<script src="js/game/events.js?v=150"></script>
+<script src="js/game/challenge.js?v=150"></script>
+<script src="js/game/shop.js?v=150"></script>
+<script src="js/game/progression.js?v=150"></script>
+<script src="js/game/save.js?v=150"></script>
+<script src="js/game/render.js?v=150"></script>
+<script src="js/game/hud.js?v=150"></script>
+<script src="js/game/input.js?v=150"></script>
+<script src="js/game/touch.js?v=150"></script>
+<script src="js/game/loop.js?v=150"></script>
+<script src="js/game/main.js?v=150"></script>
 </body>
 </html>

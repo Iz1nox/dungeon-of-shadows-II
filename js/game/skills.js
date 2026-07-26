@@ -21,7 +21,12 @@ const Skills = {
     const ok = this.execute(sk);
     if (ok === false) return; // np. blink w ścianę
 
-    p.mp -= sk.mp;
+    // Regalia Otchłannego Kultu (4 części) — szansa na darmowe rzucenie
+    if (p.d.flags.setCultFocus && U.chance(p.d.flags.setCultFocus)) {
+      Fx.text(p.x, p.y - .9, 'SKUPIENIE!', '#3ddc84', 14);
+    } else {
+      p.mp -= sk.mp;
+    }
     sk.cdT = sk.cd * (1 - p.d.cdr);
     if (sk.ult) Sfx.play('ult'); else Sfx.play('magic');
   },

@@ -35,7 +35,10 @@ Object.assign(Game, {
     const p = s.p;
     p.x = s.map.spawn.x; p.y = s.map.spawn.y;
     p.phoenixFloorUsed = false;
+    p.heroGuardUsed = false;
     p.statuses = {};
+    s.challenge = null;
+    Hud.challengeBanner(0, 0);
     Fx.reset();
     Renderer.weather = [];
     Enemies.spawnFloor();
@@ -162,6 +165,7 @@ Object.assign(Game, {
       Combat.updateTelegraphs(dt);
       Combat.updateZones(dt);
       Combat.updateTraps(dt);
+      Challenge.update(dt);
       Inv.updateDrops(dt);
 
       // FOV i pathfinding z ograniczoną częstotliwością

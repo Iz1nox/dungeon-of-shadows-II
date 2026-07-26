@@ -187,10 +187,15 @@ const Dungeon = {
     if (U.chance(.55)) put(TILE.SHRINE);
     if (U.chance(.4)) put(TILE.ALTAR);
     if (U.chance(.45)) put(TILE.WELL);
-    // sklep
-    if (SHOP_FLOORS.includes(floor)) {
+    // sklep (Pakt Nędzy zamyka handel)
+    if (SHOP_FLOORS.includes(floor) && !Game.hasPact('poverty')) {
       const s = put(TILE.SHOP);
       if (s) map.shopPos = s;
+    }
+    // arena wyzwania — od 2. piętra, nie na piętrze bossa
+    if (!isBossFloor && floor >= 2 && U.chance(BAL.challengeChance)) {
+      const c = put(TILE.CHALLENGE);
+      if (c) map.challengePos = c;
     }
   },
 

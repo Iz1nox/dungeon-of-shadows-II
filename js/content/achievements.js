@@ -20,6 +20,9 @@ const AchievementDB = {
     { id: 'all_classes', name: 'Sześć Twarzy', icon: '🎭', desc: 'Zagraj każdą z 6 klas.' },
     { id: 'boss_nohit', name: 'Nietykalny', icon: '👻', desc: 'Pokonaj bossa bez otrzymania obrażeń.' },
     { id: 'mimic_slayer', name: 'To Nie Skrzynia!', icon: '📦', desc: 'Zabij Mimika.' },
+    { id: 'arena3', name: 'Gladiator', icon: '⚔️', desc: 'Ukończ 3 Areny Otchłani w jednej wyprawie.' },
+    { id: 'full_set', name: 'Komplet', icon: '🟩', desc: 'Załóż 4 części jednego zestawu.' },
+    { id: 'pact3', name: 'Zaprzedany', icon: '🩸', desc: 'Ukończ wyprawę z trzema Paktami Otchłani naraz.' },
   ],
   byId(id) { return this.list.find(a => a.id === id); },
 };

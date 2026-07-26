@@ -296,6 +296,15 @@ const Renderer = {
         ctx.fillText('🧙', cx, cy + Math.sin(this.time * 3) * 2);
         break;
       }
+      case TILE.CHALLENGE: {
+        const pulse = .5 + Math.sin(this.time * 3) * .25;
+        ctx.strokeStyle = `rgba(176,106,255,${pulse})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(cx, cy, T * .42, 0, 6.29); ctx.stroke();
+        ctx.font = Math.round(T * .55) + 'px serif';
+        ctx.fillText('⚔️', cx, cy);
+        break;
+      }
       case TILE.SPIKES: {
         ctx.fillStyle = 'rgba(200,200,210,.7)';
         for (let k = 0; k < 3; k++) {

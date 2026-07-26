@@ -3,6 +3,16 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.5.0', date: '17.07.2026', name: 'Pakty i Relikwie',
+    items: [
+      '🩸 <b>Pakty Otchłani</b> — dobrowolne utrudnienia wybierane przed wyprawą (Rój, Kruchość, Pośpiech, Elity, Post, Nędza). Każdy podnosi mnożnik zdobywanej Esencji Dusz.',
+      '🟩 <b>Zestawy przedmiotów</b> — trzy komplety (Dziedzictwo Pierwszego Bohatera, Regalia Otchłannego Kultu, Łachy Cienioskoczka) z bonusami za 2 i 4 części',
+      '🌟 <b>Relikwie bossów</b> — każdy boss ma własną, unikalną legendę, której nie znajdziesz nigdzie indziej',
+      '⚔️ <b>Areny Otchłani</b> — opcjonalne wyzwanie: przetrwaj 3 fale wrogów, zgarnij pewny łup i Esencję',
+      '🏅 Trzy nowe osiągnięcia: Gladiator, Komplet, Zaprzedany',
+    ],
+  },
+  {
     v: '1.4.1', date: '17.07.2026', name: 'Szlify Mobilne',
     items: [
       '📜 Ekran tytułowy przewija się na telefonie — wszystkie przyciski (Bestiariusz, Rekordy...) są dostępne',
