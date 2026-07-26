@@ -23,6 +23,8 @@ const AchievementDB = {
     { id: 'arena3', name: 'Gladiator', icon: '⚔️', desc: 'Ukończ 3 Areny Otchłani w jednej wyprawie.' },
     { id: 'full_set', name: 'Komplet', icon: '🟩', desc: 'Załóż 4 części jednego zestawu.' },
     { id: 'pact3', name: 'Zaprzedany', icon: '🩸', desc: 'Ukończ wyprawę z trzema Paktami Otchłani naraz.' },
+    { id: 'gambler', name: 'Hazardzista', icon: '🎲', desc: 'Kup 15 nieopisanych przedmiotów u handlarza (łącznie).' },
+    { id: 'lucky', name: 'Ślepy Traf', icon: '🍀', desc: 'Wylosuj legendę z nieopisanego przedmiotu.' },
   ],
   byId(id) { return this.list.find(a => a.id === id); },
 };

@@ -57,37 +57,45 @@ const ItemDB = {
     },
   },
 
+  // g = rodzaj gramatyczny bazy: m (męski), f (żeński), p (liczba mnoga)
   bases: {
     weapon: [
-      { id: 'sword', name: 'Miecz', icon: '⚔️' },
-      { id: 'axe', name: 'Topór', icon: '🪓' },
-      { id: 'dagger', name: 'Sztylet', icon: '🗡️' },
-      { id: 'staff', name: 'Kostur', icon: '🪄' },
-      { id: 'bow', name: 'Łuk', icon: '🏹' },
-      { id: 'hammer', name: 'Młot', icon: '🔨' },
+      { id: 'sword', name: 'Miecz', icon: '⚔️', g: 'm' },
+      { id: 'axe', name: 'Topór', icon: '🪓', g: 'm' },
+      { id: 'dagger', name: 'Sztylet', icon: '🗡️', g: 'm' },
+      { id: 'staff', name: 'Kostur', icon: '🪄', g: 'm' },
+      { id: 'bow', name: 'Łuk', icon: '🏹', g: 'm' },
+      { id: 'hammer', name: 'Młot', icon: '🔨', g: 'm' },
     ],
     helmet: [
-      { id: 'helm', name: 'Hełm', icon: '🪖' },
-      { id: 'hood', name: 'Kaptur', icon: '🎩' },
-      { id: 'crown', name: 'Diadem', icon: '👑' },
+      { id: 'helm', name: 'Hełm', icon: '🪖', g: 'm' },
+      { id: 'hood', name: 'Kaptur', icon: '🎩', g: 'm' },
+      { id: 'crown', name: 'Diadem', icon: '👑', g: 'm' },
     ],
     armor: [
-      { id: 'plate', name: 'Zbroja', icon: '🛡️' },
-      { id: 'robe', name: 'Szata', icon: '🥋' },
-      { id: 'leather', name: 'Kurta', icon: '🧥' },
+      { id: 'plate', name: 'Zbroja', icon: '🛡️', g: 'f' },
+      { id: 'robe', name: 'Szata', icon: '🥋', g: 'f' },
+      { id: 'leather', name: 'Kurta', icon: '🧥', g: 'f' },
     ],
     boots: [
-      { id: 'boots', name: 'Buty', icon: '🥾' },
-      { id: 'greaves', name: 'Nagolenice', icon: '👢' },
+      { id: 'boots', name: 'Buty', icon: '🥾', g: 'p' },
+      { id: 'greaves', name: 'Nagolenice', icon: '👢', g: 'p' },
     ],
     amulet: [
-      { id: 'amulet', name: 'Amulet', icon: '📿' },
-      { id: 'talisman', name: 'Talizman', icon: '🧿' },
+      { id: 'amulet', name: 'Amulet', icon: '📿', g: 'm' },
+      { id: 'talisman', name: 'Talizman', icon: '🧿', g: 'm' },
     ],
     ring: [
-      { id: 'ring', name: 'Pierścień', icon: '💍' },
-      { id: 'band', name: 'Obręcz', icon: '⭕' },
+      { id: 'ring', name: 'Pierścień', icon: '💍', g: 'm' },
+      { id: 'band', name: 'Obręcz', icon: '⭕', g: 'f' },
     ],
+  },
+
+  // odmiana przymiotnika przez rodzaj: Pradawny → Pradawna (Kurta) / Pradawne (Nagolenice)
+  declense(adj, g) {
+    if (g === 'f') return adj.replace(/[yi]$/, 'a');
+    if (g === 'p') return /i$/.test(adj) ? adj + 'e' : adj.replace(/y$/, 'e');
+    return adj;
   },
 
   prefixes: {
@@ -281,7 +289,9 @@ const ItemDB = {
       affixes.push({ id: pool[i], val: this.affixes[pool[i]].roll(lvl) });
     }
     let name = base.name;
-    if (rarity !== 'common' && this.prefixes[rarity]) name = U.choice(this.prefixes[rarity]) + ' ' + name;
+    if (rarity !== 'common' && this.prefixes[rarity]) {
+      name = this.declense(U.choice(this.prefixes[rarity]), base.g) + ' ' + name;
+    }
     return {
       uid: this.uid++, kind: 'equip', slot, base: base.id, icon: base.icon,
       name, rarity, lvl, plus: 0,

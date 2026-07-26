@@ -14,7 +14,7 @@ const SaveSys = {
       pacts: s.pacts || [],
       challenge: s.challenge || null,
       runStats: s.runStats,
-      shopStock: s.shopStock,
+      shop: s.shop,
       player: {
         cls: p.cls, level: p.level, xp: p.xp, xpNext: p.xpNext,
         hp: p.hp, mp: p.mp, gold: p.gold, dust: p.dust,
@@ -89,7 +89,10 @@ const SaveSys = {
     s.pacts = d.pacts || [];
     s.challenge = d.challenge || null;
     s.runStats = Object.assign(s.runStats, d.runStats);
-    s.shopStock = d.shopStock || null;
+    // zapisy sprzed v1.6.0 miały samą listę towarów
+    s.shop = d.shop || (d.shopStock
+      ? { stock: d.shopStock, refreshes: 0, buyback: [], gambles: 0 }
+      : null);
 
     // mapa
     const biome = BiomeDB.forFloor(d.floor);

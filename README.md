@@ -49,6 +49,14 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.6.0**
+- 🛒 rework handlarza: zakładki Towary / Hazard / Sprzedaż
+- 💎 wyróżniona „perełka" i odświeżanie asortymentu za złoto
+- 🎲 hazard — nieopisane przedmioty w ciemno, lepsze szanse na rzadkości
+- 💰 sprzedaż hurtem, odkup ostatnich transakcji, wymiana złota na Pył
+- 🏅 2 nowe osiągnięcia
+- ✍️ poprawna odmiana nazw przedmiotów przez rodzaj gramatyczny
+
 **1.5.0**
 - 🩸 Pakty Otchłani — 6 dobrowolnych utrudnień za mnożnik Esencji
 - 🟩 3 zestawy przedmiotów z bonusami za 2 i 4 części

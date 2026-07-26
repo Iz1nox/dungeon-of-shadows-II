@@ -31,7 +31,7 @@ Object.assign(Game, {
     s.enemies = []; s.minions = []; s.projectiles = [];
     s.drops = []; s.zones = []; s.telegraphs = []; s.traps = [];
     s.boss = null; s.bossDefeated = false;
-    s.shopStock = null;
+    s.shop = null;   // każde piętro = nowy handlarz i nowy asortyment
     const p = s.p;
     p.x = s.map.spawn.x; p.y = s.map.spawn.y;
     p.phoenixFloorUsed = false;

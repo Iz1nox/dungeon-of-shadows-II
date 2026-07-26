@@ -3,6 +3,18 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.6.0', date: '26.07.2026', name: 'Kupiec Otchłani',
+    items: [
+      '🛒 <b>Handlarz przebudowany</b> — trzy zakładki zamiast jednej listy: Towary, Hazard i Sprzedaż',
+      '💎 <b>Perełka</b> — na każdym piętrze jedna wyróżniona pozycja wysokiej rzadkości',
+      '🔄 <b>Odświeżanie asortymentu</b> za złoto (każde kolejne droższe)',
+      '🎲 <b>Hazard</b> — kup nieopisaną broń, pancerz albo biżuterię w ciemno; szanse na rzadkości dużo lepsze niż przy zwykłym łupie',
+      '💰 Sprzedaż hurtem jednym kliknięciem, <b>odkup</b> ostatnio sprzedanych rzeczy i wymiana złota na Pył Otchłani',
+      '🏅 Dwa nowe osiągnięcia: Hazardzista i Ślepy Traf',
+      '✍️ Nazwy przedmiotów odmieniają się poprawnie — koniec z „Pradawny Kurta" (teraz „Pradawna Kurta", „Demoniczne Nagolenice")',
+    ],
+  },
+  {
     v: '1.5.0', date: '26.07.2026', name: 'Pakty i Relikwie',
     items: [
       '🩸 <b>Pakty Otchłani</b> — dobrowolne utrudnienia wybierane przed wyprawą (Rój, Kruchość, Pośpiech, Elity, Post, Nędza). Każdy podnosi mnożnik zdobywanej Esencji Dusz.',

@@ -4,7 +4,7 @@
 // =============================================
 'use strict';
 
-const GAME_VERSION = '1.5.0';
+const GAME_VERSION = '1.6.0';
 const SAVE_VERSION = 1;
 const SAVE_KEY = 'dos2_save_';
 const META_KEY = 'dos2_meta';
@@ -105,6 +105,18 @@ const BAL = {
   shrineCurseChance: .22,
   mimicChance: .16,
   chestGoldBase: 26,
+
+  // handlarz
+  shopMarkup: 1.15,           // narzut na zwykły towar
+  shopFeaturedMarkup: 1.45,   // narzut na towar wyróżniony
+  shopRefreshBase: 55,        // koszt odświeżenia asortymentu
+  shopRefreshPerFloor: 24,
+  shopRefreshGrowth: 1.85,    // każde kolejne odświeżenie na tym piętrze droższe
+  gambleBase: 70,             // cena „nieopisanego przedmiotu"
+  gamblePerFloor: 34,
+  gambleLuck: 5,              // o ile lepsze losowanie rzadkości niż zwykły drop
+  dustPrice: 8,               // ile złota za 1 Pył Otchłani
+  buybackSlots: 3,
 
   // arena wyzwania
   challengeChance: .6,
