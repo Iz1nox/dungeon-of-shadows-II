@@ -3,7 +3,7 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
-    v: '1.5.0', date: '17.07.2026', name: 'Pakty i Relikwie',
+    v: '1.5.0', date: '26.07.2026', name: 'Pakty i Relikwie',
     items: [
       '🩸 <b>Pakty Otchłani</b> — dobrowolne utrudnienia wybierane przed wyprawą (Rój, Kruchość, Pośpiech, Elity, Post, Nędza). Każdy podnosi mnożnik zdobywanej Esencji Dusz.',
       '🟩 <b>Zestawy przedmiotów</b> — trzy komplety (Dziedzictwo Pierwszego Bohatera, Regalia Otchłannego Kultu, Łachy Cienioskoczka) z bonusami za 2 i 4 części',
@@ -13,7 +13,7 @@ const ChangelogDB = [
     ],
   },
   {
-    v: '1.4.1', date: '17.07.2026', name: 'Szlify Mobilne',
+    v: '1.4.1', date: '22.07.2026', name: 'Szlify Mobilne',
     items: [
       '📜 Ekran tytułowy przewija się na telefonie — wszystkie przyciski (Bestiariusz, Rekordy...) są dostępne',
       '🖥️ Tryb mobilny włącza się na każdym urządzeniu dotykowym, niezależnie od rozmiaru ekranu (naprawia nachodzące elementy w Ekwipunku i u Handlarza)',
@@ -22,7 +22,7 @@ const ChangelogDB = [
     ],
   },
   {
-    v: '1.4.0', date: '17.07.2026', name: 'Otchłań w Kieszeni',
+    v: '1.4.0', date: '22.07.2026', name: 'Otchłań w Kieszeni',
     items: [
       '📱 <b>Pełna obsługa telefonów i tabletów</b>: wirtualny joystick, auto-celowanie w najbliższego wroga, dotykowe przyciski ataku, uniku i umiejętności',
       '🎯 Wskaźnik auto-celu — widzisz, w kogo polecą strzały',
@@ -31,7 +31,7 @@ const ChangelogDB = [
     ],
   },
   {
-    v: '1.3.0', date: '16.07.2026', name: 'Rekordy i Koszmar',
+    v: '1.3.0', date: '17.07.2026', name: 'Rekordy i Koszmar',
     items: [
       '🎚️ Trzy poziomy trudności do wyboru na ekranie tytułowym: <b>Wędrowiec</b> (łagodniej), <b>Śmiałek</b> i <b>Koszmar</b> (+50% HP wrogów, więcej elit, ale esencja ×1,6)',
       '🏆 Panel „Rekordy": najgłębsze zejście, najszybsze zwycięstwo, rekordy zabójstw, poziomu i złota',
@@ -51,7 +51,7 @@ const ChangelogDB = [
     ],
   },
   {
-    v: '1.1.0', date: '15.07.2026', name: 'Echa i Wygody',
+    v: '1.1.0', date: '14.07.2026', name: 'Echa i Wygody',
     items: [
       '🎵 Proceduralna muzyka ambientowa — każdy biom ma własny motyw (suwak w ustawieniach)',
       '▶️ Przycisk „Kontynuuj" na ekranie tytułowym (z autozapisu)',
@@ -62,7 +62,7 @@ const ChangelogDB = [
     ],
   },
   {
-    v: '1.0.0', date: '13.07.2026', name: 'Serce Otchłani',
+    v: '1.0.0', date: '14.07.2026', name: 'Serce Otchłani',
     items: [
       '🫀 Premiera! 16 pięter przez 5 skażonych krain aż do Serca Otchłani',
       '🎭 6 klas (nowi: Paladyn i Łowca Pustki), po 5 umiejętności z ultą',
