@@ -9,13 +9,48 @@ const Shop = {
   // stan sklepu żyje w stanie wyprawy (trafia do zapisu)
   state() {
     const s = Game.s;
-    if (!s.shop) s.shop = { stock: this.genStock(), refreshes: 0, buyback: [], gambles: 0 };
+    if (!s.shop) s.shop = { stock: this.genStock(), refreshes: 0, buyback: [], gambles: 0, underCounter: null };
     return s.shop;
+  },
+
+  // ===== ZAUFANIE HANDLARZA =====
+  rep() { return Game.s.shopRep || 0; },
+  tier() { return MerchantDB.tier(this.rep()); },
+
+  addRep(points) {
+    const s = Game.s;
+    const before = MerchantDB.tierIndex(s.shopRep || 0);
+    s.shopRep = (s.shopRep || 0) + points;
+    const after = MerchantDB.tierIndex(s.shopRep);
+    if (after > before) {
+      const t = MerchantDB.tiers[after];
+      Sfx.play('achieve');
+      Game.msg('🤝 ' + MerchantDB.name + ' ufa ci bardziej: ' + t.name
+        + ' (zniżka ' + Math.round(t.discount * 100) + '%)', 'gold');
+      if (t.underCounter && !this.state().underCounter) {
+        Game.msg('🕯️ „Zajrzyj pod ladę. Mam tam coś dla ciebie."', 'magic');
+      }
+      if (after === MerchantDB.tiers.length - 1) Meta.unlock('confidant');
+    }
+  },
+
+  // towar spod lady pojawia się, gdy zaufanie na to pozwala
+  ensureUnderCounter() {
+    const st = this.state();
+    if (!this.tier().underCounter || st.underCounter) return;
+    const s = Game.s;
+    const rarity = U.chance(.4) ? 'legend' : 'set';
+    st.underCounter = {
+      item: ItemDB.rollEquip(s.floor, { rarity, luck: s.p.d.luck + 2 }),
+      sold: false, under: true,
+    };
   },
 
   // ===== ASORTYMENT =====
   genStock() {
-    const s = Game.s, floor = s.floor, luck = s.p.d.luck;
+    const s = Game.s, floor = s.floor;
+    // zaufany klient dostaje lepszy towar
+    const luck = s.p.d.luck + (s.shopRep ? MerchantDB.tier(s.shopRep).luck : 0);
     const stock = [];
     // wyróżniona perełka — zawsze wysoka rzadkość
     const featRarity = U.chance(.15) ? 'legend' : (U.chance(.45) ? 'set' : 'epic');
@@ -37,8 +72,9 @@ const Shop = {
   },
 
   priceOf(entry) {
-    const mult = entry.featured ? BAL.shopFeaturedMarkup : BAL.shopMarkup;
-    return Math.round(ItemDB.price(entry.item) * mult);
+    const mult = entry.under ? BAL.underCounterMarkup
+      : entry.featured ? BAL.shopFeaturedMarkup : BAL.shopMarkup;
+    return Math.max(1, Math.round(ItemDB.price(entry.item) * mult * (1 - this.tier().discount)));
   },
 
   refreshCost() {
@@ -80,10 +116,24 @@ const Shop = {
       : this.tab === 'sell' ? this.renderSell()
         : this.renderGoods();
 
+    const rep = this.rep(), tier = this.tier(), next = MerchantDB.nextTier(rep);
+    const tierIdx = MerchantDB.tierIndex(rep);
+    const prevAt = MerchantDB.tiers[tierIdx].at;
+    const pct = next ? U.clamp((rep - prevAt) / (next.at - prevAt) * 100, 0, 100) : 100;
+    const biomeLine = MerchantDB.biomeLine(Game.s.map.biome.id);
+
     el.innerHTML = `
       <button class="panel-close" onclick="Shop.close()">✕</button>
-      <h3>🧙 Wędrowny Handlarz</h3>
-      <div class="p-sub">„Zszedłem tu przed tobą. Nie pytaj jak."</div>
+      <h3>🧙 ${MerchantDB.name}</h3>
+      <div class="p-sub">${MerchantDB.role} • ${MerchantDB.greeting(rep, Game.s.floor)}</div>
+      ${biomeLine ? `<div class="shop-biome-line">„${U.esc(biomeLine)}"</div>` : ''}
+      <div class="shop-rep">
+        <div class="rep-head">
+          <span>🤝 ${tier.name}${tier.discount ? ' — zniżka ' + Math.round(tier.discount * 100) + '%' : ''}</span>
+          <span class="rep-next">${next ? 'do „' + next.name + '": ' + Math.max(0, Math.ceil(next.at - rep)) : 'najwyższe zaufanie'}</span>
+        </div>
+        <div class="rep-bar"><i style="width:${pct}%"></i></div>
+      </div>
       <div class="shop-gold">💰 ${U.fmt(p.gold)} złota &nbsp;•&nbsp; ✨ ${U.fmt(p.dust)} Pyłu</div>
       <div class="inv-tabs">
         <button class="inv-tab ${this.tab === 'goods' ? 'active' : ''}" onclick="Shop.setTab('goods')">🛒 Towary</button>
@@ -97,6 +147,7 @@ const Shop = {
 
   renderGoods() {
     const st = this.state(), p = Game.s.p;
+    this.ensureUnderCounter();
     const cost = this.refreshCost();
     let items = '';
     st.stock.forEach((entry, i) => {
@@ -132,10 +183,28 @@ const Shop = {
       buyback += '</div>';
     }
 
+    // towar spod lady — tylko dla zaufanych
+    let under = '';
+    if (st.underCounter && !st.underCounter.sold) {
+      const it = st.underCounter.item;
+      const rar = ItemDB.rarities[it.rarity];
+      const price = this.priceOf(st.underCounter);
+      under = `<div class="shop-sub">🕯️ Spod lady</div>
+        <div class="shop-grid"><div class="shop-item under" data-under="1">
+          <span class="si-icon">${it.icon}</span>
+          <div class="si-body">
+            <div class="si-name" style="color:${rar.color}">${U.esc(it.name)}</div>
+            <div class="si-desc">${rar.name} • poz. ${it.lvl} • „Tego nie było na liście."</div>
+          </div>
+          <span class="si-price ${p.gold < price ? 'cant' : ''}">💰${price}</span>
+        </div></div>`;
+    }
+
     return `<div class="shop-grid">${items}</div>
       <div class="shop-actions">
         <button onclick="Shop.refresh()" ${p.gold < cost ? 'disabled' : ''}>🔄 Odśwież asortyment (💰${cost})</button>
       </div>
+      ${under}
       ${buyback}
       <div class="shop-sell-hint">Kliknij, by kupić. Perełka to najlepszy towar na tym piętrze — droższa, ale warta swojej ceny.</div>`;
   },
@@ -214,6 +283,14 @@ const Shop = {
       div.onmouseleave = () => ItemTip.hide();
       div.onclick = () => this.buy(+div.dataset.i);
     });
+    el.querySelectorAll('.shop-item[data-under]').forEach(div => {
+      const entry = st.underCounter;
+      if (!entry || entry.sold) return;
+      div.onmouseenter = ev => ItemTip.show(entry.item, ev);
+      div.onmousemove = ev => ItemTip.move(ev);
+      div.onmouseleave = () => ItemTip.hide();
+      div.onclick = () => this.buyUnder();
+    });
     el.querySelectorAll('.shop-item[data-bb]').forEach(div => {
       const b = st.buyback[+div.dataset.bb];
       if (!b) return;
@@ -245,8 +322,27 @@ const Shop = {
     if (!Inv.addItem(entry.item)) { Sfx.play('error'); Game.msg('🎒 Ekwipunek pełny!', 'bad'); return; }
     p.gold -= price;
     entry.sold = true;
+    this.addRep(price * BAL.repPerGoldSpent);
     Sfx.play('gold');
     Game.msg('🧙 Kupiono: ' + entry.item.name, 'gold');
+    ItemTip.hide();
+    this.render();
+  },
+
+  buyUnder() {
+    const p = Game.s.p, st = this.state();
+    const entry = st.underCounter;
+    if (!entry || entry.sold) return;
+    const price = this.priceOf(entry);
+    if (p.gold < price) { Sfx.play('error'); Game.msg('💰 Za mało złota!', 'bad'); return; }
+    if (!Inv.addItem(entry.item)) { Sfx.play('error'); Game.msg('🎒 Ekwipunek pełny!', 'bad'); return; }
+    p.gold -= price;
+    entry.sold = true;
+    this.addRep(price * BAL.repPerGoldSpent);
+    if (entry.item.rarity === 'legend') Meta.unlock('legend_find');
+    Sfx.play('achieve');
+    Game.msg('🕯️ Spod lady: ' + entry.item.name, 'gold');
+    this.flashReveal(entry.item);
     ItemTip.hide();
     this.render();
   },
@@ -260,6 +356,7 @@ const Shop = {
     p.gold += price;
     st.buyback.unshift({ item, price });
     while (st.buyback.length > BAL.buybackSlots) st.buyback.pop();
+    this.addRep(price * BAL.repPerGoldEarned);
     Sfx.play('gold');
     Game.msg('🧙 Sprzedano: ' + item.name + ' (+' + price + ' 💰)', 'gold');
     ItemTip.hide();
@@ -277,6 +374,7 @@ const Shop = {
       sum += ItemDB.sellPrice(it);
     }
     p.gold += sum;
+    this.addRep(sum * BAL.repPerGoldEarned);
     Sfx.play('gold');
     Game.msg('🧙 Sprzedano ' + batch.length + ' szt. (+' + sum + ' 💰)', 'gold');
     this.render();
@@ -325,6 +423,7 @@ const Shop = {
 
     p.gold -= price;
     st.gambles++;
+    this.addRep(BAL.repPerGamble);
     Inv.addItem(item);
 
     Meta.data.stats.gambles = (Meta.data.stats.gambles || 0) + 1;

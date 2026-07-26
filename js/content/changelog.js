@@ -3,6 +3,16 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.7.0', date: '26.07.2026', name: 'Wit Popielny',
+    items: [
+      '🧙 Handlarz ma imię, twarz i historię — <b>Wit Popielny</b> wita cię inaczej w każdej krainie i komentuje, jak długo się znacie',
+      '🤝 <b>Zaufanie handlarza</b> rośnie z każdą transakcją: pięć progów od Nieznajomego po Powiernika Otchłani',
+      '💸 Wyższe zaufanie to <b>zniżki do 18%</b> i lepszej jakości asortyment',
+      '🕯️ <b>Towar spod lady</b> — od progu Wspólnika Wit wyciąga rzeczy, których nie ma na ladzie: pewny zestaw albo legenda',
+      '🏅 Nowe osiągnięcie: Powiernik',
+    ],
+  },
+  {
     v: '1.6.1', date: '26.07.2026', name: 'Poprawka Ekwipunku',
     items: [
       '🎒 Naprawiony układ Ekwipunku — przy długich nazwach (części zestawów, relikwie bossów) sloty rozpychały się i siatka przedmiotów nachodziła na wyposażenie',

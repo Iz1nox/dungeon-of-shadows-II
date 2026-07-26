@@ -15,6 +15,7 @@ const SaveSys = {
       challenge: s.challenge || null,
       runStats: s.runStats,
       shop: s.shop,
+      shopRep: s.shopRep || 0,
       player: {
         cls: p.cls, level: p.level, xp: p.xp, xpNext: p.xpNext,
         hp: p.hp, mp: p.mp, gold: p.gold, dust: p.dust,
@@ -89,6 +90,7 @@ const SaveSys = {
     s.pacts = d.pacts || [];
     s.challenge = d.challenge || null;
     s.runStats = Object.assign(s.runStats, d.runStats);
+    s.shopRep = d.shopRep || 0;
     // zapisy sprzed v1.6.0 miały samą listę towarów
     s.shop = d.shop || (d.shopStock
       ? { stock: d.shopStock, refreshes: 0, buyback: [], gambles: 0 }

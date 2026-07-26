@@ -49,6 +49,12 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.7.0**
+- 🧙 handlarz z tożsamością (Wit Popielny), kwestie zależne od biomu i zaufania
+- 🤝 reputacja u handlarza: 5 progów, zniżki do 18%, lepszy asortyment
+- 🕯️ towar spod lady od progu Wspólnika (pewny zestaw albo legenda)
+- 🏅 nowe osiągnięcie: Powiernik
+
 **1.6.1**
 - 🎒 fix układu paneli: `1fr` → `minmax(0,1fr)` we wszystkich siatkach —
   długie nazwy rozpychały kolumny i siatka przedmiotów nachodziła na ekwipunek

@@ -25,6 +25,7 @@ const AchievementDB = {
     { id: 'pact3', name: 'Zaprzedany', icon: '🩸', desc: 'Ukończ wyprawę z trzema Paktami Otchłani naraz.' },
     { id: 'gambler', name: 'Hazardzista', icon: '🎲', desc: 'Kup 15 nieopisanych przedmiotów u handlarza (łącznie).' },
     { id: 'lucky', name: 'Ślepy Traf', icon: '🍀', desc: 'Wylosuj legendę z nieopisanego przedmiotu.' },
+    { id: 'confidant', name: 'Powiernik', icon: '🤝', desc: 'Zdobądź najwyższe zaufanie Wita Popielnego.' },
   ],
   byId(id) { return this.list.find(a => a.id === id); },
 };

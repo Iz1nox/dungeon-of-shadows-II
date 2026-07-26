@@ -34,6 +34,7 @@ const Game = {
       endless: false, floor: 1, time: 0,
       difficulty: Meta.data.difficulty || 'normal',
       pacts: (Meta.data.pacts || []).slice(),
+      shopRep: 0,          // zaufanie handlarza — rośnie przez całą wyprawę
       map: null,
       p: null,
       enemies: [], minions: [], projectiles: [], drops: [],

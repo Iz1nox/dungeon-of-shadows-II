@@ -4,7 +4,7 @@
 // =============================================
 'use strict';
 
-const GAME_VERSION = '1.6.1';
+const GAME_VERSION = '1.7.0';
 const SAVE_VERSION = 1;
 const SAVE_KEY = 'dos2_save_';
 const META_KEY = 'dos2_meta';
@@ -117,6 +117,10 @@ const BAL = {
   gambleLuck: 5,              // o ile lepsze losowanie rzadkości niż zwykły drop
   dustPrice: 8,               // ile złota za 1 Pył Otchłani
   buybackSlots: 3,
+  repPerGoldSpent: 1 / 25,    // zaufanie handlarza za wydane złoto
+  repPerGoldEarned: 1 / 45,   // ...i za sprzedaż
+  repPerGamble: 3,
+  underCounterMarkup: 1.9,    // narzut na towar spod lady
 
   // arena wyzwania
   challengeChance: .6,
