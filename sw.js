@@ -2,7 +2,7 @@
 
 // Service worker: network-first z zapasem z cache.
 // Online — zawsze świeża wersja; offline — gra działa z cache.
-const CACHE = 'dos2-v160';
+const CACHE = 'dos2-v161';
 
 self.addEventListener('install', () => self.skipWaiting());
 

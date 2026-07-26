@@ -49,6 +49,10 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.6.1**
+- 🎒 fix układu paneli: `1fr` → `minmax(0,1fr)` we wszystkich siatkach —
+  długie nazwy rozpychały kolumny i siatka przedmiotów nachodziła na ekwipunek
+
 **1.6.0**
 - 🛒 rework handlarza: zakładki Towary / Hazard / Sprzedaż
 - 💎 wyróżniona „perełka" i odświeżanie asortymentu za złoto

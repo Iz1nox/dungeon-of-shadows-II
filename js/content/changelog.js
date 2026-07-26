@@ -3,6 +3,13 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.6.1', date: '26.07.2026', name: 'Poprawka Ekwipunku',
+    items: [
+      '🎒 Naprawiony układ Ekwipunku — przy długich nazwach (części zestawów, relikwie bossów) sloty rozpychały się i siatka przedmiotów nachodziła na wyposażenie',
+      '🧰 Ta sama poprawka objęła sklep, Sanktuarium i Osiągnięcia',
+    ],
+  },
+  {
     v: '1.6.0', date: '26.07.2026', name: 'Kupiec Otchłani',
     items: [
       '🛒 <b>Handlarz przebudowany</b> — trzy zakładki zamiast jednej listy: Towary, Hazard i Sprzedaż',
