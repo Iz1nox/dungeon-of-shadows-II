@@ -3,6 +3,13 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.7.1', date: '27.07.2026', name: 'Szlify',
+    items: [
+      '⌨️ Przytrzymanie <b>Tab</b> nie miga już mapą — akcje reagują raz na wciśnięcie klawisza (dotyczy też uniku i umiejętności)',
+      '🧪 Pod maską: zestaw 52 automatycznych testów, które przed każdą aktualizacją sprawdzają walkę, umiejętności, bossów, sklep i zapisy',
+    ],
+  },
+  {
     v: '1.7.0', date: '26.07.2026', name: 'Wit Popielny',
     items: [
       '🧙 Handlarz ma imię, twarz i historię — <b>Wit Popielny</b> wita cię inaczej w każdej krainie i komentuje, jak długo się znacie',

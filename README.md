@@ -49,6 +49,10 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.7.1**
+- 🧪 zestaw 52 testów „na sucho" (`node tests/smoke.js`)
+- ⌨️ fix: przytrzymany Tab migotał mapą; akcje reagują raz na wciśnięcie
+
 **1.7.0**
 - 🧙 handlarz z tożsamością (Wit Popielny), kwestie zależne od biomu i zaufania
 - 🤝 reputacja u handlarza: 5 progów, zniżki do 18%, lepszy asortyment
@@ -107,6 +111,21 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 - 🔧 fix: panele tytułu (Bestiariusz/Osiągnięcia/Sanktuarium) otwierały się pod ekranem tytułowym
 - 🔧 fix: Mimik nie skaluje się już podwójnie z piętrem
 - 🚀 cache-busting zasobów — aktualizacje bez Ctrl+F5
+
+## Testy
+
+```bash
+node tests/smoke.js
+```
+
+Testy „na sucho" ładują całą grę w Node (atrapa DOM zamiast przeglądarki, bez canvasa)
+i sprawdzają 52 scenariusze: spójność danych, generowanie lochów, losowanie przedmiotów,
+symulację walki dla każdej klasy, wszystkie 30 umiejętności, bossów i ich ataki,
+progresję, ekwipunek, Kuźnię, handlarza, areny oraz zapis i wczytanie stanu.
+
+Kolejność ładowania skryptów czytana jest wprost z `index.html`, więc testy nie
+rozjeżdżają się z grą po dodaniu nowego pliku. Kod kończy się kodem wyjścia 1,
+gdy cokolwiek nie przejdzie — nadaje się do CI.
 
 ## Struktura kodu
 

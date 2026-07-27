@@ -48,6 +48,14 @@ const Input = {
     Game.keys[k] = true;
     Sfx.init();
 
+    // Przytrzymany klawisz auto-powtarza keydown. Ruch korzysta ze stanu Game.keys,
+    // więc powtórki są mu niepotrzebne, a akcje (mapa, unik, umiejętności, panele)
+    // mają reagować raz na wciśnięcie — inaczej mapa migocze przy trzymaniu Tab.
+    if (e.repeat) {
+      if (k === 'tab' || k === ' ') e.preventDefault();
+      return;
+    }
+
     // Esc — zamykanie paneli / pauza
     if (k === 'escape') {
       e.preventDefault();
