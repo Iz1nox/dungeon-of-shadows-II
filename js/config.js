@@ -4,7 +4,7 @@
 // =============================================
 'use strict';
 
-const GAME_VERSION = '1.7.1';
+const GAME_VERSION = '1.7.2';
 const SAVE_VERSION = 1;
 const SAVE_KEY = 'dos2_save_';
 const META_KEY = 'dos2_meta';
@@ -121,6 +121,14 @@ const BAL = {
   repPerGoldEarned: 1 / 45,   // ...i za sprzedaż
   repPerGamble: 3,
   underCounterMarkup: 1.9,    // narzut na towar spod lady
+
+  // zagrożenia terenu dla wrogów (obrażenia = flat + % maks. HP,
+  // żeby parzyły tak samo szczura, jak i golema)
+  enemyHazardTick: .5,        // co ile sekund zagrożenie rani wroga
+  enemyLavaFlat: 12, enemyLavaPct: .06,
+  enemySpikeFlat: 8, enemySpikePct: .035,
+  enemyVoidFlat: 14, enemyVoidPct: .07,
+  enemyHazardAvoid: .7,       // odsetek wrogów, które omijają zagrożenia
 
   // arena wyzwania
   challengeChance: .6,

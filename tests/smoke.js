@@ -479,6 +479,107 @@ test('statusy nakładają się, tykają i wygasają', () => {
   assertEq(e.statuses.poison.stacks, BAL.poisonMaxStacks, 'limit kumulacji trucizny');
 });
 
+test('zagrożenia terenu ranią wrogów', () => {
+  const s = newRun('warrior', 10);
+  const p = s.p;
+  s.enemies.length = 0;
+  const cases = [
+    [TILE.LAVA, 'lawa'], [TILE.SPIKES, 'kolce'], [TILE.VOID, 'pustka'],
+  ];
+  for (const [tile, label] of cases) {
+    const x = (p.x | 0) + 4, y = p.y | 0;
+    Dungeon.set(s.map, x, y, tile);
+    const e = Enemies.make('magma_golem', x + .5, y + .5, { noElite: true });
+    e.speed = 0;                    // stoi w miejscu, żeby zmierzyć samo zagrożenie
+    e.baseSpeed = 0;
+    s.enemies.push(e);
+    const hp0 = e.hp;
+    for (let i = 0; i < 120; i++) Enemies.tileHazards(e, 1 / 60);
+    assert(e.hp < hp0, label + ' nie zraniła wroga');
+    Dungeon.set(s.map, x, y, TILE.FLOOR);
+  }
+  // trucizna i lód nakładają statusy zamiast obrażeń
+  const x = (p.x | 0) + 5, y = p.y | 0;
+  Dungeon.set(s.map, x, y, TILE.POISON);
+  const e2 = Enemies.make('snow_wolf', x + .5, y + .5, { noElite: true });
+  e2.speed = 0; e2.baseSpeed = 0;
+  for (let i = 0; i < 120; i++) Enemies.tileHazards(e2, 1 / 60);
+  assert(e2.statuses.poison, 'kałuża jadu nie zatruła wroga');
+  Dungeon.set(s.map, x, y, TILE.FLOOR);
+});
+
+test('lawa parzy proporcjonalnie do wielkości, a odporni cierpią mniej', () => {
+  const s = newRun('warrior', 10);
+  const measure = (typeId) => {
+    const x = (s.p.x | 0) + 4, y = s.p.y | 0;
+    Dungeon.set(s.map, x, y, TILE.LAVA);
+    const e = Enemies.make(typeId, x + .5, y + .5, { noElite: true });
+    e.speed = 0; e.baseSpeed = 0;
+    const hp0 = e.hp;
+    for (let i = 0; i < 180; i++) Enemies.tileHazards(e, 1 / 60);
+    Dungeon.set(s.map, x, y, TILE.FLOOR);
+    return (hp0 - e.hp) / hp0;      // ułamek puli HP
+  };
+  // składnik procentowy sprawia, że lawa boli też grubasów
+  const small = measure('grave_rat');
+  const bigNeutral = measure('crystal_sentinel');   // 300 HP, bez odporności na ogień
+  assert(small > 0, 'lawa nie zraniła małego wroga');
+  assert(bigNeutral > .07, 'lawa niemal nie rusza dużego wroga (' + (bigNeutral * 100).toFixed(1) + '% HP)');
+  // ...ale odporność na ogień nadal ma znaczenie
+  const fireProof = measure('magma_golem');         // resist.fire = .2
+  assert(fireProof < bigNeutral, 'odporność na ogień nie chroni przed lawą');
+});
+
+test('rozważni wrogowie omijają ogień, nierozważni brną przez niego', () => {
+  const s = newRun('warrior', 10);
+  s.enemies.length = 0;
+  // własna arena testowa o znanych współrzędnych — nie zdajemy się na układ mapy
+  const Y = 25, X0 = 12;
+  for (let dx = 0; dx <= 16; dx++)
+    for (let dy = -5; dy <= 5; dy++) Dungeon.set(s.map, X0 + dx, Y + dy, TILE.FLOOR);
+  for (let dx = 4; dx <= 7; dx++)
+    for (let dy = -5; dy <= 5; dy++) Dungeon.set(s.map, X0 + dx, Y + dy, TILE.LAVA);
+
+  const framesInLava = (careful) => {
+    const e = Enemies.make('snow_wolf', X0 + 11.5, Y + .5, { noElite: true });
+    e.aggro = true;
+    e.hazardCare = careful;
+    let n = 0;
+    for (let i = 0; i < 300; i++) {
+      Enemies.step(e, -e.speed, 0, 1 / 60);          // pcha się w stronę gracza
+      if (Dungeon.tile(s.map, e.x | 0, e.y | 0) === TILE.LAVA) n++;
+    }
+    return n;
+  };
+  const careful = framesInLava(true);
+  const reckless = framesInLava(false);
+  // pas lawy ma 4 kratki, wilk pokonuje go w ~73 klatkach (~1,2 s parzenia)
+  assert(reckless > 40, 'nierozważny wróg nie przeszedł przez lawę (' + reckless + ' klatek)');
+  assertEq(careful, 0, 'rozważny wróg wszedł w lawę (' + careful + ' klatek)');
+});
+
+test('ostrożność wobec zagrożeń jest cechą wroga, nie losem co klatkę', () => {
+  Game.s = Game.newRunState('warrior');
+  Game.s.floor = 8;
+  let careful = 0;
+  for (let i = 0; i < 400; i++) if (Enemies.make('snow_wolf', 5, 5, { noElite: true }).hazardCare) careful++;
+  const pct = careful / 400;
+  assert(Math.abs(pct - BAL.enemyHazardAvoid) < .07,
+    'odsetek ostrożnych (' + (pct * 100).toFixed(0) + '%) odbiega od ustawienia ' +
+    (BAL.enemyHazardAvoid * 100) + '%');
+});
+
+test('bossowie stąpają ponad zagrożeniami', () => {
+  const s = newRun('warrior', 3);
+  const b = s.boss;
+  const x = b.x | 0, y = b.y | 0;
+  Dungeon.set(s.map, x, y, TILE.LAVA);
+  const hp0 = b.hp;
+  for (let i = 0; i < 300; i++) Enemies.tileHazards(b, 1 / 60);
+  assertEq(b.hp, hp0, 'boss otrzymał obrażenia od lawy');
+  Dungeon.set(s.map, x, y, TILE.FLOOR);
+});
+
 test('bossowie są odporni na pełną kontrolę', () => {
   const s = newRun('warrior', 3);
   const b = s.boss;

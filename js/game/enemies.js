@@ -37,6 +37,7 @@ const Enemies = {
       stealthTimer: def.stealthCd ? U.rand(1, def.stealthCd) : 0, invisT: 0,
       eliteZapT: 3,
       bobPhase: Math.random() * 6.28,
+      hazardCare: U.chance(BAL.enemyHazardAvoid),   // czy omija lawę i kolce
     };
     // elita?
     const eliteChance = (BAL.eliteChanceBase + floor * BAL.eliteChancePerFloor + dif.eliteBonus)
@@ -78,6 +79,8 @@ const Enemies = {
       if (e.dead) { s.enemies.splice(i, 1); continue; }
 
       Combat.updateStatuses(e, dt);
+      if (e.dead) { s.enemies.splice(i, 1); continue; }
+      this.tileHazards(e, dt);
       if (e.dead) { s.enemies.splice(i, 1); continue; }
       if (e.hitFlashT > 0) e.hitFlashT -= dt;
       e.hpGhost = U.lerp(e.hpGhost, e.hp / e.maxHp, dt * 3);
@@ -131,8 +134,84 @@ const Enemies = {
     }
   },
 
+  // czy kafel parzy / truje / rani
+  hazardTile(t) {
+    return t === TILE.LAVA || t === TILE.SPIKES || t === TILE.POISON || t === TILE.VOID;
+  },
+
+  // Rozważny wróg omija zagrożenia. Ostrożność to cecha przypisana przy
+  // tworzeniu (a nie rzut kością co klatkę — przy 60 FPS każdy prędzej czy
+  // później by się poparzył). Szarża, skok i bombowce zawsze idą na oślep.
+  reckless(e) {
+    return e.hazardCare === false || e.ai === 'bomber'
+      || e.state === 'charge' || e.state === 'leap';
+  },
+
   step(e, vx, vy, dt) {
-    Player.moveWithCollision(e, e.x + vx * dt, e.y + vy * dt, Game.s.map);
+    const map = Game.s.map;
+    if (!this.reckless(e) && (vx || vy)) {
+      const hz = (x, y) => this.hazardTile(Dungeon.tile(map, x | 0, y | 0));
+      // wchodzi w ogień, choć sam w nim nie stoi → obejdź, zamiast stanąć
+      if (!hz(e.x, e.y) && hz(e.x + vx * dt, e.y + vy * dt)) {
+        const okX = vx !== 0 && !hz(e.x + vx * dt, e.y);
+        const okY = vy !== 0 && !hz(e.x, e.y + vy * dt);
+        if (okX) vy = 0;                 // wystarczy iść samą osią X
+        else if (okY) vx = 0;            // ...albo samą Y
+        else {
+          // przód zablokowany — ślizgaj się wzdłuż krawędzi zagrożenia
+          const a = { x: -vy, y: vx }, b = { x: vy, y: -vx };
+          if (!hz(e.x + a.x * dt, e.y + a.y * dt)) { vx = a.x; vy = a.y; }
+          else if (!hz(e.x + b.x * dt, e.y + b.y * dt)) { vx = b.x; vy = b.y; }
+          else { vx = 0; vy = 0; }       // otoczony ogniem — przeczekaj
+        }
+      }
+    }
+    Player.moveWithCollision(e, e.x + vx * dt, e.y + vy * dt, map);
+  },
+
+  // Zagrożenia terenu ranią też przeciwników — obrażenia częściowo procentowe,
+  // żeby lawa parzyła zarówno szczura, jak i golema.
+  tileHazards(e, dt) {
+    if (e.isBoss) return;                     // bossowie stąpają ponad tym
+    const map = Game.s.map;
+    const t = Dungeon.tile(map, e.x | 0, e.y | 0);
+    if (t === TILE.FLOOR || t === TILE.WALL) return;
+
+    // stoi w ogniu → szuka wyjścia (chyba że to szarżujący desperat)
+    if (this.hazardTile(t) && !this.reckless(e) && e.speed > 0) {
+      for (const [dx, dy] of U.shuffle([[1, 0], [-1, 0], [0, 1], [0, -1]])) {
+        const tx = (e.x | 0) + dx, ty = (e.y | 0) + dy;
+        if (Dungeon.walkable(map, tx, ty) && !this.hazardTile(Dungeon.tile(map, tx, ty))) {
+          Player.moveWithCollision(e, e.x + dx * e.speed * dt, e.y + dy * e.speed * dt, map);
+          break;
+        }
+      }
+    }
+
+    e.hazardT = (e.hazardT || 0) - dt;
+    if (e.hazardT > 0) return;
+    e.hazardT = BAL.enemyHazardTick;
+    const hit = (flat, pct, element) =>
+      Combat.dealToEnemy(e, flat + e.maxHp * pct, { element, fromHazard: true });
+
+    switch (t) {
+      case TILE.LAVA:
+        hit(BAL.enemyLavaFlat, BAL.enemyLavaPct, 'fire');
+        if (!e.dead) Combat.applyStatus(e, 'burn', 2);
+        break;
+      case TILE.SPIKES:
+        hit(BAL.enemySpikeFlat, BAL.enemySpikePct, 'phys');
+        break;
+      case TILE.VOID:
+        hit(BAL.enemyVoidFlat, BAL.enemyVoidPct, 'shadow');
+        break;
+      case TILE.POISON:
+        Combat.applyStatus(e, 'poison', 3);
+        break;
+      case TILE.ICE:
+        Combat.applyStatus(e, 'chill', 1.2);
+        break;
+    }
   },
 
   // ruch w stronę gracza: LOS → prosto; inaczej flow field

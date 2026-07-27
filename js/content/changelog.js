@@ -3,6 +3,15 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.7.2', date: '27.07.2026', name: 'Ogień Nie Wybiera',
+    items: [
+      '🔥 <b>Lawa, kolce, jad i pustka ranią teraz także wrogów</b> — obrażenia zależą od ich puli zdrowia, więc parzą i szczura, i golema',
+      '🧠 Około 70% przeciwników omija zagrożenia; reszta brnie prosto przez ogień. Szarżujący, skaczący i bombowce <b>zawsze</b> pchają się na oślep — da się je wmanewrować w płomienie',
+      '🛡️ Odporności działają: Golem Magmowy ledwo czuje lawę',
+      '👑 Bossowie stąpają ponad zagrożeniami — na nich ta sztuczka nie zadziała',
+    ],
+  },
+  {
     v: '1.7.1', date: '27.07.2026', name: 'Szlify',
     items: [
       '⌨️ Przytrzymanie <b>Tab</b> nie miga już mapą — akcje reagują raz na wciśnięcie klawisza (dotyczy też uniku i umiejętności)',

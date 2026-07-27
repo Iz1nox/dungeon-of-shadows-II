@@ -49,6 +49,11 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.7.2**
+- 🔥 zagrożenia terenu ranią wrogów (obrażenia flat + % maks. HP)
+- 🧠 ostrożność wobec zagrożeń jako cecha wroga (70%); szarża/skok/bombowce zawsze nierozważne
+- 📊 `tests/balance.js` — stała sonda balansu (podaż łupów, krzywa mocy, zagrożenia)
+
 **1.7.1**
 - 🧪 zestaw 52 testów „na sucho" (`node tests/smoke.js`)
 - ⌨️ fix: przytrzymany Tab migotał mapą; akcje reagują raz na wciśnięcie
@@ -126,6 +131,15 @@ progresję, ekwipunek, Kuźnię, handlarza, areny oraz zapis i wczytanie stanu.
 Kolejność ładowania skryptów czytana jest wprost z `index.html`, więc testy nie
 rozjeżdżają się z grą po dodaniu nowego pliku. Kod kończy się kodem wyjścia 1,
 gdy cokolwiek nie przejdzie — nadaje się do CI.
+
+```bash
+node tests/balance.js
+```
+
+Sonda balansu nic nie sprawdza — **mierzy**: ile przedmiotów każdej rzadkości sypie
+gra na wyprawę i skąd, jaka jest krzywa mocy gracza kontra wrogowie na kolejnych
+piętrach (TTK/TTD i „przewaga") oraz jak dotkliwe są zagrożenia terenu. Służy do
+opierania zmian balansu na liczbach zamiast na przeczuciu.
 
 ## Struktura kodu
 
