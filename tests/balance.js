@@ -33,7 +33,7 @@ function loadGame() {
   return vm.runInContext(`({
     Game, Player, Combat, Enemies, Bosses, Inv, Shop, Progression, Meta, Dungeon, U,
     ItemDB, EnemyDB, ClassDB, BiomeDB, BAL, TILE, FINAL_FLOOR, GAME_VERSION,
-  })`, ctx, { filename: 'api-export' });
+  })`, ctx, { filename: 'api-eksport' });
 }
 
 const G = loadGame();
@@ -206,4 +206,45 @@ const perTick = BAL.enemyLavaFlat + probe.maxHp * BAL.enemyLavaPct;
 console.log('\n   Przejście Ogara przez 3 kratki lawy: ' + Math.round(ticks * perTick) +
   ' obrażeń (' + Math.round(ticks * perTick / probe.maxHp * 100) + '% jego puli HP)');
 console.log('   Odsetek wrogów omijających zagrożenia: ' + Math.round(BAL.enemyHazardAvoid * 100) + '%');
+
+// =====================================================================
+console.log('\n═══ 4. UNIKI PRZECIWNIKÓW ═══');
+console.log('   Ile pocisków gracza dosięga celu (im niżej, tym więcej uników)\n');
+
+function hitRate(typeId, floor, elite) {
+  const Combat = G.Combat;
+  Game.s = Game.newRunState('hunter');
+  Game.loadFloor(floor);
+  const s = Game.s, p = s.p;
+  // wykarczowana arena, żeby pociski nie ginęły na ścianach
+  for (let x = 19; x <= 45; x++) for (let y = 17; y <= 33; y++) Dungeon.set(s.map, x, y, TILE.FLOOR);
+  p.x = 21; p.y = 25;
+  let hits = 0; const shots = 300;
+  for (let i = 0; i < shots; i++) {
+    s.enemies.length = 0; s.projectiles.length = 0;
+    const e = Enemies.make(typeId, p.x + 6, p.y, elite ? { elite: 'swift' } : { noElite: true });
+    e.baseSpeed = 0; e.speed = 0; e.aggro = false;
+    e.hp = e.maxHp = 1e6; e.dodgeCd = 0;
+    s.enemies.push(e);
+    const hp0 = e.hp;
+    Combat.spawnProjectile({ x: p.x, y: p.y, ang: 0, speed: 12, size: .18,
+      flat: 10, element: 'phys', color: '#fff', friendly: true, range: 16 });
+    for (let f = 0; f < 90 && s.projectiles.length; f++) {
+      Enemies.update(1 / 60);
+      Combat.updateProjectiles(1 / 60);
+    }
+    if (e.hp < hp0) hits++;
+  }
+  return hits / shots;
+}
+
+console.log('   cel                     piętro 3   piętro 10   piętro 16');
+for (const [label, typeId] of [['Śnieżny Wilk (zwinny)', 'snow_wolf'], ['Golem Magmowy (ociężały)', 'magma_golem']]) {
+  const r = [3, 10, 16].map(f => Math.round(hitRate(typeId, f, false) * 100) + '%');
+  console.log('   ' + label.padEnd(24) + r.map(x => x.padStart(8)).join('    '));
+}
+const eliteRate = Math.round(hitRate('snow_wolf', 16, true) * 100);
+console.log('   ' + 'Elita (zwinna), piętro 16'.padEnd(24) + (eliteRate + '%').padStart(8));
+console.log('\n   Zwinność progiem szybkości: ' + BAL.aiAgileSpeed +
+  ' | odnowienie uniku: ' + BAL.aiDodgeCd + 's | sufit szansy: ' + Math.round(BAL.aiDodgeMax * 100) + '%');
 console.log('');

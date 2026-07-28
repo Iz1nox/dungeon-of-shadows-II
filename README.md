@@ -49,6 +49,12 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.7.3**
+- 🤸 uskoki przed pociskami (szansa rośnie z piętrem, elity +20%, sufit 60%)
+- 🌀 okrążanie gracza przez ścigających, krążenie strzelców w zasięgu
+- 👥 rozpychanie się w tłumie, ucieczka z telegrafowanych uderzeń gracza
+- 📊 sonda balansu mierzy też trafialność pocisków
+
 **1.7.2**
 - 🔥 zagrożenia terenu ranią wrogów (obrażenia flat + % maks. HP)
 - 🧠 ostrożność wobec zagrożeń jako cecha wroga (70%); szarża/skok/bombowce zawsze nierozważne

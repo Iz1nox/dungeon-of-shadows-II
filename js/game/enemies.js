@@ -38,6 +38,8 @@ const Enemies = {
       eliteZapT: 3,
       bobPhase: Math.random() * 6.28,
       hazardCare: U.chance(BAL.enemyHazardAvoid),   // czy omija lawę i kolce
+      dodgeT: 0, dodgeCd: U.rand(0, BAL.aiDodgeCd), dodgeDX: 0, dodgeDY: 0,
+      strafeDir: U.chance(.5) ? 1 : -1, strafeT: U.rand(0, BAL.aiStrafeFlip),
     };
     // elita?
     const eliteChance = (BAL.eliteChanceBase + floor * BAL.eliteChancePerFloor + dif.eliteBonus)
@@ -88,6 +90,17 @@ const Enemies = {
       // kontrola tłumu
       if (e.statuses.stun || e.statuses.freeze) continue;
 
+      // uskok przed pociskiem ma pierwszeństwo nad wszystkim innym
+      this.tryDodge(e, dt);
+      if (e.dodgeT > 0) {
+        e.dodgeT -= dt;
+        this.step(e, e.dodgeDX * BAL.aiDodgeSpeed, e.dodgeDY * BAL.aiDodgeSpeed, dt);
+        continue;
+      }
+      // zejście z zapowiedzianego uderzenia — druga w kolejności
+      if (this.fleeTelegraphs(e, dt)) continue;
+      this.separation(e, dt);
+
       // szybkość po statusach
       e.speed = e.baseSpeed * (e.statuses.chill ? 1 - BAL.chillSlow : 1);
       if (e.statuses.root) e.speed = 0;
@@ -132,6 +145,94 @@ const Enemies = {
     if (e.speed > 0) {
       this.step(e, Math.cos(e.wanderA) * e.speed * .35, Math.sin(e.wanderA) * e.speed * .35, dt);
     }
+  },
+
+  // ===== ZACHOWANIA TAKTYCZNE =====
+
+  // Czy wróg jest dość zwinny, by uskakiwać. Golemy i zombie — nie.
+  agile(e) {
+    return e.def_.speed >= BAL.aiAgileSpeed && !e.def_.big;
+  },
+
+  dodgeChance(e) {
+    const c = BAL.aiDodgeBase + Game.s.floor * BAL.aiDodgePerFloor + (e.elite ? BAL.aiDodgeElite : 0);
+    return Math.min(BAL.aiDodgeMax, c);
+  },
+
+  // Czy pocisk trafi wroga w ciągu `horizon` sekund (najbliższe podejście toru).
+  willHit(e, pr, horizon) {
+    const vx = pr.vx, vy = pr.vy;
+    const v2 = vx * vx + vy * vy;
+    if (v2 < .01) return false;
+    const rx = e.x - pr.x, ry = e.y - pr.y;
+    const t = (rx * vx + ry * vy) / v2;
+    if (t < 0 || t > horizon) return false;
+    const cx = rx - vx * t, cy = ry - vy * t;
+    const r = e.radius + pr.size + .2;
+    return cx * cx + cy * cy < r * r;
+  },
+
+  // Uskok w bok przed nadlatującym pociskiem gracza.
+  tryDodge(e, dt) {
+    if (e.dodgeCd > 0) e.dodgeCd -= dt;
+    if (e.dodgeT > 0 || e.dodgeCd > 0 || !this.agile(e)) return;
+    if (e.statuses.stun || e.statuses.freeze || e.statuses.root) return;
+    for (const pr of Game.s.projectiles) {
+      if (!pr.friendly) continue;
+      if (!this.willHit(e, pr, BAL.aiDodgeReact)) continue;
+      if (!U.chance(this.dodgeChance(e))) { e.dodgeCd = BAL.aiDodgeCd * .5; return; }
+      // w bok względem toru lotu, w stronę, w którą i tak jest odsunięty
+      const len = Math.hypot(pr.vx, pr.vy) || 1;
+      let px = -pr.vy / len, py = pr.vx / len;
+      const off = (e.x - pr.x) * px + (e.y - pr.y) * py;
+      if (off < 0) { px = -px; py = -py; }
+      else if (Math.abs(off) < .05 && U.chance(.5)) { px = -px; py = -py; }
+      e.dodgeDX = px; e.dodgeDY = py;
+      e.dodgeT = BAL.aiDodgeTime;
+      e.dodgeCd = BAL.aiDodgeCd;
+      Fx.burst(e.x, e.y, '#ffffff', 4, { spd: 2, life: .25, size: 3 });
+      return;
+    }
+  },
+
+  // Rozpychanie się, żeby tłum nie zlepiał się w jeden punkt.
+  separation(e, dt) {
+    let sx = 0, sy = 0, n = 0;
+    for (const o of Game.s.enemies) {
+      if (o === e || o.dead) continue;
+      const dx = e.x - o.x, dy = e.y - o.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 > BAL.aiSeparation * BAL.aiSeparation) continue;
+      if (d2 < .0001) {
+        // idealne nałożenie (np. wspólny punkt przyzwania) — pchnij w losową
+        // stronę, inaczej taka para utknęłaby w sobie na zawsze
+        const a = Math.random() * Math.PI * 2;
+        sx += Math.cos(a); sy += Math.sin(a); n++;
+        continue;
+      }
+      const d = Math.sqrt(d2);
+      sx += dx / d; sy += dy / d; n++;
+    }
+    if (!n) return;
+    this.step(e, (sx / n) * BAL.aiSeparationForce, (sy / n) * BAL.aiSeparationForce, dt);
+  },
+
+  // Ucieczka z zapowiedzianego uderzenia gracza (np. deszcz meteorów).
+  fleeTelegraphs(e, dt) {
+    for (const t of Game.s.telegraphs) {
+      if (!t.friendly || t.t < .2) continue;
+      let dx = e.x - t.x, dy = e.y - t.y;
+      let d = Math.hypot(dx, dy);
+      if (d > t.r) continue;
+      if (d < .05) {
+        // stoi dokładnie w epicentrum — bez tego wektor ucieczki byłby zerowy
+        const a = Math.random() * Math.PI * 2;
+        dx = Math.cos(a); dy = Math.sin(a); d = 1;
+      }
+      this.step(e, (dx / d) * BAL.aiTelegraphFlee, (dy / d) * BAL.aiTelegraphFlee, dt);
+      return true;
+    }
+    return false;
   },
 
   // czy kafel parzy / truje / rani
@@ -214,17 +315,49 @@ const Enemies = {
     }
   },
 
-  // ruch w stronę gracza: LOS → prosto; inaczej flow field
-  seekPlayer(e, dt, mult = 1) {
+  // co jakiś czas zmienia stronę, w którą okrąża gracza
+  flipStrafe(e, dt) {
+    e.strafeT -= dt;
+    if (e.strafeT <= 0) {
+      e.strafeT = BAL.aiStrafeFlip * U.rand(.7, 1.3);
+      e.strafeDir *= -1;
+    }
+  },
+
+  // ruch w stronę gracza: LOS → prosto; inaczej flow field.
+  // `strafe` domiesza ruch styczny, dzięki czemu wrogowie krążą,
+  // zamiast zbijać się w jeden punkt przed graczem.
+  seekPlayer(e, dt, mult = 1, strafe = 0) {
     const s = Game.s, p = s.p;
     if (e.speed <= 0) return;
+    let vx, vy;
     if (FOV.lineOfSight(s.map, e.x, e.y, p.x, p.y)) {
       const a = U.angle(e.x, e.y, p.x, p.y);
-      this.step(e, Math.cos(a) * e.speed * mult, Math.sin(a) * e.speed * mult, dt);
+      vx = Math.cos(a); vy = Math.sin(a);
     } else {
       const dir = Path.dirToPlayer(s.map, e.x, e.y);
-      if (dir) this.step(e, dir.x * e.speed * mult, dir.y * e.speed * mult, dt);
+      if (!dir) return;
+      vx = dir.x; vy = dir.y;
+      strafe = 0;                       // w korytarzach krążenie nie ma sensu
     }
+    if (strafe) {
+      this.flipStrafe(e, dt);
+      const tx = -vy * strafe * e.strafeDir, ty = vx * strafe * e.strafeDir;
+      vx += tx; vy += ty;
+      const len = Math.hypot(vx, vy) || 1;
+      vx /= len; vy /= len;
+    }
+    this.step(e, vx * e.speed * mult, vy * e.speed * mult, dt);
+  },
+
+  // czysty ruch po okręgu wokół gracza — strzelcy nie stoją jak słupy
+  strafeAround(e, dt, mult = 1) {
+    if (e.speed <= 0) return;
+    const p = Game.s.p;
+    this.flipStrafe(e, dt);
+    const a = U.angle(e.x, e.y, p.x, p.y);
+    this.step(e, -Math.sin(a) * e.speed * mult * e.strafeDir,
+      Math.cos(a) * e.speed * mult * e.strafeDir, dt);
   },
 
   fleePlayer(e, dt, mult = 1) {
@@ -272,7 +405,8 @@ const Enemies = {
     const s = Game.s, p = s.p, def = e.def_;
     switch (e.ai) {
       case 'chase':
-        if (!this.tryMelee(e, distP)) this.seekPlayer(e, dt);
+        // w zwarciu okrąża gracza zamiast stać przed nim jak słup
+        if (!this.tryMelee(e, distP)) this.seekPlayer(e, dt, 1, distP < 4.5 ? BAL.aiStrafe : 0);
         break;
 
       case 'erratic': {
@@ -287,8 +421,9 @@ const Enemies = {
 
       case 'ranged': {
         const hasLOS = FOV.lineOfSight(s.map, e.x, e.y, p.x, p.y);
-        if (distP < 3.5) this.fleePlayer(e, dt, .8);
-        else if (distP > 7 || !hasLOS) this.seekPlayer(e, dt);
+        if (distP < 3.5) this.fleePlayer(e, dt, .95);          // odskakuje żwawiej
+        else if (distP > 7 || !hasLOS) this.seekPlayer(e, dt, 1, .3);
+        else this.strafeAround(e, dt, .7);                     // krąży w zasięgu strzału
         if (hasLOS && distP < 9 && e.attackCdT <= 0) {
           e.attackCdT = def.attackCd || 1.6;
           this.shoot(e, def);

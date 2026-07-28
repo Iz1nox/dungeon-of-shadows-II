@@ -3,6 +3,16 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.7.3', date: '27.07.2026', name: 'Zwierzę Wie, Kiedy Uskoczyć',
+    items: [
+      '🤸 <b>Zwinni wrogowie uskakują przed pociskami</b> — im głębiej, tym lepiej im to wychodzi (elity ponad połowę razy). Golemy i zombie są na to za ociężałe',
+      '🌀 <b>Ścigający okrążają cię</b> zamiast biec na wprost, a strzelcy krążą w zasięgu strzału zamiast stać jak słupy',
+      '👥 <b>Tłum się rozpycha</b> — wrogowie nie zlepiają się już w jeden punkt',
+      '💨 Przeciwnicy <b>schodzą z zapowiedzianych uderzeń</b> (np. spod deszczu meteorów)',
+      '⚡ Uskok ma odnowienie, więc seria strzałów i tak dosięga celu',
+    ],
+  },
+  {
     v: '1.7.2', date: '27.07.2026', name: 'Ogień Nie Wybiera',
     items: [
       '🔥 <b>Lawa, kolce, jad i pustka ranią teraz także wrogów</b> — obrażenia zależą od ich puli zdrowia, więc parzą i szczura, i golema',

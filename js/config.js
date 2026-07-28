@@ -4,7 +4,7 @@
 // =============================================
 'use strict';
 
-const GAME_VERSION = '1.7.2';
+const GAME_VERSION = '1.7.3';
 const SAVE_VERSION = 1;
 const SAVE_KEY = 'dos2_save_';
 const META_KEY = 'dos2_meta';
@@ -129,6 +129,22 @@ const BAL = {
   enemySpikeFlat: 8, enemySpikePct: .035,
   enemyVoidFlat: 14, enemyVoidPct: .07,
   enemyHazardAvoid: .7,       // odsetek wrogów, które omijają zagrożenia
+
+  // zachowania AI
+  aiDodgeBase: .2,            // bazowa szansa na uskok przed pociskiem
+  aiDodgePerFloor: .012,
+  aiDodgeElite: .2,
+  aiDodgeMax: .6,
+  aiDodgeCd: 1.6,             // nie da się uskakiwać przed serią
+  aiDodgeReact: .45,          // reaguje na pociski, które trafią w ciągu tylu sekund
+  aiDodgeSpeed: 7.5,
+  aiDodgeTime: .18,
+  aiAgileSpeed: 1.8,          // od jakiej szybkości wróg w ogóle potrafi uskoczyć
+  aiSeparation: .62,          // promień rozpychania się w tłumie
+  aiSeparationForce: 1.5,
+  aiStrafe: .55,              // jak mocno wrogowie okrążają gracza w zwarciu
+  aiStrafeFlip: 3.5,          // co ile sekund zmieniają kierunek okrążania
+  aiTelegraphFlee: 2.2,       // jak szybko uciekają z zapowiedzianego uderzenia
 
   // arena wyzwania
   challengeChance: .6,

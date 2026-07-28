@@ -147,6 +147,30 @@ function steerAndAim() {
   return target;
 }
 
+// Wykarczowana arena o znanych współrzędnych. Testy pocisków i ruchu nie mogą
+// zależeć od tego, gdzie generator postawił ściany — inaczej strzał trafia
+// w mur i wynik jest przypadkowy.
+function carveArena(cx = 32, cy = 25, halfW = 13, halfH = 8) {
+  const s = Game.s;
+  for (let x = cx - halfW; x <= cx + halfW; x++)
+    for (let y = cy - halfH; y <= cy + halfH; y++) Dungeon.set(s.map, x, y, TILE.FLOOR);
+  s.p.x = cx - halfW + 2; s.p.y = cy;
+  s.enemies.length = 0;
+  s.projectiles.length = 0;
+  s.telegraphs.length = 0;
+  return { cx, cy };
+}
+
+// nieruchomy cel: dalej potrafi uskakiwać (uskok ma własną prędkość),
+// ale nie wędruje ani nie goni, więc pomiar dotyczy tylko badanego zachowania
+function frozenTarget(typeId, x, y) {
+  const e = Enemies.make(typeId, x, y, { noElite: true });
+  e.baseSpeed = 0; e.speed = 0;
+  e.aggro = false;
+  Game.s.enemies.push(e);
+  return e;
+}
+
 // dosypuje wrogów w pobliżu gracza, żeby walka faktycznie się zaczęła
 function spawnNearPlayer(n) {
   const s = Game.s, p = s.p;
@@ -477,6 +501,104 @@ test('statusy nakładają się, tykają i wygasają', () => {
   // trucizna kumuluje się do limitu
   for (let i = 0; i < 10; i++) Combat.applyStatus(e, 'poison', 5);
   assertEq(e.statuses.poison.stacks, BAL.poisonMaxStacks, 'limit kumulacji trucizny');
+});
+
+test('zwinni wrogowie uskakują przed pociskami, ociężali nie', () => {
+  const s = newRun('hunter', 12);
+  const p = s.p;
+  // trafialność: strzelamy wprost we wroga i liczymy, ile pocisków dosięgło
+  const hitRate = (typeId) => {
+    let hits = 0; const shots = 60;
+    for (let i = 0; i < shots; i++) {
+      carveArena();
+      const e = frozenTarget(typeId, p.x + 6, p.y);
+      e.hp = e.maxHp = 1e6;
+      e.dodgeCd = 0;
+      const hp0 = e.hp;
+      Combat.spawnProjectile({ x: p.x, y: p.y, ang: 0, speed: 12, size: .18,
+        flat: 10, element: 'phys', color: '#fff', friendly: true, range: 16 });
+      for (let f = 0; f < 90 && s.projectiles.length; f++) {
+        Enemies.update(1 / 60);
+        Combat.updateProjectiles(1 / 60);
+      }
+      if (e.hp < hp0) hits++;
+    }
+    return hits / shots;
+  };
+  const agile = hitRate('snow_wolf');       // szybkość 3.3 → uskakuje
+  const heavy = hitRate('magma_golem');     // szybkość 1.1 → nie potrafi
+  assertEq(Enemies.agile(Enemies.make('magma_golem', 5, 5, { noElite: true })), false,
+    'golem nie powinien być uznany za zwinnego');
+  assert(heavy > .9, 'ociężały wróg powinien obrywać niemal zawsze (trafień ' + (heavy * 100).toFixed(0) + '%)');
+  assert(agile < heavy - .1, 'zwinny wróg nie uskakuje (trafień ' + (agile * 100).toFixed(0) +
+    '% vs ' + (heavy * 100).toFixed(0) + '%)');
+});
+
+test('uskoki mają odnowienie — seria pocisków i tak dosięga', () => {
+  const s = newRun('rogue', 12);
+  const p = s.p;
+  carveArena();
+  const e = frozenTarget('snow_wolf', p.x + 6, p.y);
+  e.hp = e.maxHp = 1e6;
+  e.dodgeCd = 0;
+  let hits = 0;
+  for (let i = 0; i < 10; i++) {
+    const hp0 = e.hp;
+    Combat.spawnProjectile({ x: p.x, y: e.y, ang: U.angle(p.x, e.y, e.x, e.y), speed: 12, size: .18,
+      flat: 10, element: 'phys', color: '#fff', friendly: true, range: 16 });
+    for (let f = 0; f < 45; f++) { Enemies.update(1 / 60); Combat.updateProjectiles(1 / 60); }
+    if (e.hp < hp0) hits++;
+  }
+  assert(hits >= 3, 'przy serii 10 pocisków wróg uniknął niemal wszystkich (trafień: ' + hits + ')');
+});
+
+test('wrogowie rozpychają się zamiast zlepiać w jeden punkt', () => {
+  const s = newRun('warrior', 8);
+  carveArena();
+  const cx = s.p.x + 6, cy = s.p.y;
+  // wszyscy dokładnie w jednym punkcie — najtrudniejszy przypadek
+  for (let i = 0; i < 10; i++) frozenTarget('skeleton_warrior', cx, cy);
+  const spread = () => {
+    let maxD = 0;
+    for (const a of s.enemies) for (const b of s.enemies) maxD = Math.max(maxD, U.dist(a.x, a.y, b.x, b.y));
+    return maxD;
+  };
+  const before = spread();
+  for (let f = 0; f < 120; f++) Enemies.update(1 / 60);
+  const after = spread();
+  assert(after > before + .5, 'tłum się nie rozproszył (' + before.toFixed(2) + ' → ' + after.toFixed(2) + ')');
+});
+
+test('wrogowie schodzą z zapowiedzianego uderzenia gracza', () => {
+  const s = newRun('mage', 10);
+  carveArena();
+  const tx = s.p.x + 5, ty = s.p.y;
+  // wróg dokładnie w epicentrum — wektor ucieczki musi mieć fallback
+  const e = frozenTarget('snow_wolf', tx, ty);
+  Combat.addTelegraph({ x: tx, y: ty, r: 2.5, delay: 3, dmg: 50, friendly: true, element: 'fire' });
+  const d0 = U.dist(e.x, e.y, tx, ty);
+  for (let f = 0; f < 100; f++) Enemies.update(1 / 60);
+  const d1 = U.dist(e.x, e.y, tx, ty);
+  assert(d1 > d0 + 1, 'wróg nie uciekł ze strefy uderzenia (' + d0.toFixed(2) + ' → ' + d1.toFixed(2) + ')');
+});
+
+test('ścigający okrążają gracza w zwarciu', () => {
+  const s = newRun('warrior', 8);
+  carveArena();
+  const p = s.p;
+  const e = Enemies.make('skeleton_warrior', p.x + 2.2, p.y, { noElite: true });
+  s.enemies.push(e);
+  e.aggro = true;
+  e.attackCdT = 999;                     // nie atakuje, żeby mierzyć sam ruch
+  e.meleeCd = 999;
+  s.enemies.push(e);
+  const a0 = U.angle(p.x, p.y, e.x, e.y);
+  let maxSwing = 0;
+  for (let f = 0; f < 180; f++) {
+    Enemies.update(1 / 60);
+    maxSwing = Math.max(maxSwing, Math.abs(U.angDiff(a0, U.angle(p.x, p.y, e.x, e.y))));
+  }
+  assert(maxSwing > .3, 'wróg nie okrążał gracza (przesunięcie kątowe ' + maxSwing.toFixed(2) + ' rad)');
 });
 
 test('zagrożenia terenu ranią wrogów', () => {
