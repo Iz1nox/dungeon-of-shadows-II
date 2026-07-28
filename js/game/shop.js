@@ -39,9 +39,8 @@ const Shop = {
     const st = this.state();
     if (!this.tier().underCounter || st.underCounter) return;
     const s = Game.s;
-    const rarity = U.chance(.4) ? 'legend' : 'set';
     st.underCounter = {
-      item: ItemDB.rollEquip(s.floor, { rarity, luck: s.p.d.luck + 2 }),
+      item: ItemDB.rollEquip(s.floor, { rarity: ItemDB.underCounterRarity(), luck: s.p.d.luck + 2 }),
       sold: false, under: true,
     };
   },
@@ -53,8 +52,8 @@ const Shop = {
     const luck = s.p.d.luck + (s.shopRep ? MerchantDB.tier(s.shopRep).luck : 0);
     const stock = [];
     // wyróżniona perełka — zawsze wysoka rzadkość
-    const featRarity = U.chance(.15) ? 'legend' : (U.chance(.45) ? 'set' : 'epic');
-    stock.push({ item: ItemDB.rollEquip(floor, { rarity: featRarity, luck }), sold: false, featured: true });
+    stock.push({ item: ItemDB.rollEquip(floor, { rarity: ItemDB.shopFeaturedRarity(), luck }),
+      sold: false, featured: true });
     // zwykły towar
     for (let i = 0; i < U.randi(3, 4); i++) {
       let rarity = ItemDB.rollRarity(floor + 1, luck + 1);

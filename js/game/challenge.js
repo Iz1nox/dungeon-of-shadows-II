@@ -67,8 +67,7 @@ const Challenge = {
     Game.msg('🏆 Arena pokonana! Otchłań płaci daninę.', 'gold');
 
     // nagroda: pewny łup wysokiej jakości + konsument + esencja
-    const rarity = U.chance(.3) ? 'legend' : (U.chance(.5) ? 'set' : 'epic');
-    const item = ItemDB.rollEquip(s.floor, { rarity, luck: s.p.d.luck + 1 });
+    const item = ItemDB.rollEquip(s.floor, { rarity: ItemDB.arenaRewardRarity(), luck: s.p.d.luck + 1 });
     s.drops.push({ x: c.x, y: c.y, item, bob: 0 });
     if (item.rarity === 'legend') Meta.unlock('legend_find');
     s.drops.push({ x: c.x + .7, y: c.y + .3, item: ItemDB.rollConsumable(s.floor), bob: 1 });

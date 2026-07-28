@@ -78,20 +78,24 @@ function lootAudit(runs = 200) {
       for (let i = 0; i < enemyCount; i++) if (U.chance(BAL.dropChance)) add('wrogowie', ItemDB.rollAny(f, 0));
       for (let c = 0; c < U.randi(1, 2); c++)
         for (let i = 0; i < U.randi(1, 2); i++) add('skrzynie', ItemDB.rollAny(f, 1));
+      // uwaga: rzadkości nagród bierzemy z ItemDB, czyli dokładnie z tego,
+      // czego używa gra — inaczej sonda mierzyłaby własną fikcję
       if (f >= 2 && U.chance(BAL.challengeChance)) {
-        const rarity = U.chance(.3) ? 'legend' : (U.chance(.5) ? 'set' : 'epic');
-        add('areny', ItemDB.rollEquip(f, { rarity, luck: 1 }));
+        add('areny', ItemDB.rollEquip(f, { rarity: ItemDB.arenaRewardRarity(), luck: 1 }));
       }
       if ([3, 6, 9, 12, 15, 16].includes(f)) {
         const bossId = EnemyDB.bossFor(f);
         const def = bossId && EnemyDB.bosses[bossId];
-        if (def && def.legendary && U.chance(.6)) add('bossowie', ItemDB.makeLegendById(def.legendary, f));
-        else add('bossowie', ItemDB.rollEquip(f, { rarity: U.chance(.35) ? 'set' : 'epic' }));
+        const final = f === 16;
+        if (def && def.legendary && (final || U.chance(BAL.bossRelicChance))) {
+          add('bossowie', ItemDB.makeLegendById(def.legendary, f));
+        } else {
+          add('bossowie', ItemDB.rollEquip(f, { rarity: ItemDB.bossRewardRarity() }));
+        }
       }
       if ([2, 5, 8, 11, 14].includes(f)) {
-        const feat = U.chance(.15) ? 'legend' : (U.chance(.45) ? 'set' : 'epic');
-        add('sklep-perełka', ItemDB.rollEquip(f, { rarity: feat }));
-        if (f >= 11) add('spod-lady', ItemDB.rollEquip(f, { rarity: U.chance(.4) ? 'legend' : 'set' }));
+        add('sklep-perełka', ItemDB.rollEquip(f, { rarity: ItemDB.shopFeaturedRarity() }));
+        if (f >= 11) add('spod-lady', ItemDB.rollEquip(f, { rarity: ItemDB.underCounterRarity() }));
         for (let g = 0; g < 3; g++) {
           let rar = ItemDB.rollRarity(f + BAL.gambleLuck, 2);
           if (rar === 'common') rar = 'magic';

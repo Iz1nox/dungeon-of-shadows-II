@@ -799,16 +799,52 @@ test('boss przechodzi fazy i upuszcza swoją relikwię', () => {
   b.hp = b.maxHp * .2;
   Bosses.update(b, 1 / 60);
   assertEq(b.phase, 3, 'brak przejścia do fazy 3');
-  // relikwia wypada dostatecznie często
+  // relikwia wypada z częstością zgodną z ustawieniem (a nie „jakoś czasem")
+  const N = 400;
   let relics = 0;
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < N; i++) {
     const s2 = newRun('warrior', 3);
     const boss = s2.boss;
     s2.drops.length = 0;
     Combat.dealToEnemy(boss, 1e9, { element: 'phys' });
     if (s2.drops.some(d => d.item.legendId === EnemyDB.bosses[boss.id].legendary)) relics++;
   }
-  assert(relics > 10, 'relikwia bossa wypadła tylko ' + relics + '/40 razy');
+  const rate = relics / N;
+  assert(Math.abs(rate - BAL.bossRelicChance) < .07,
+    'częstość relikwii ' + (rate * 100).toFixed(0) + '% odbiega od ustawienia ' +
+    (BAL.bossRelicChance * 100) + '%');
+});
+
+test('finałowy boss zawsze upuszcza swoją relikwię', () => {
+  for (let i = 0; i < 12; i++) {
+    const s = newRun('paladin', G.FINAL_FLOOR);
+    s.drops.length = 0;
+    Combat.dealToEnemy(s.boss, 1e9, { element: 'holy' });
+    assert(s.drops.some(d => d.item.legendId === 'leg_heart_shard'),
+      'przejście gry nie nagrodziło Odłamkiem Serca (próba ' + (i + 1) + ')');
+  }
+});
+
+test('tabele rzadkości nagród są poprawne i sumują się do 1', () => {
+  const tables = {
+    arena: ItemDB.arenaRewardRarity, boss: ItemDB.bossRewardRarity,
+    featured: ItemDB.shopFeaturedRarity, underCounter: ItemDB.underCounterRarity,
+  };
+  for (const name in tables) {
+    const seen = {};
+    for (let i = 0; i < 3000; i++) {
+      const r = tables[name].call(ItemDB);
+      assert(ItemDB.rarities[r], name + ': zwrócono nieznaną rzadkość „' + r + '"');
+      seen[r] = (seen[r] || 0) + 1;
+    }
+    const total = Object.values(seen).reduce((a, b) => a + b, 0);
+    assertEq(total, 3000, name + ': nie każde losowanie coś zwróciło');
+  }
+  // towar spod lady zawsze jest wysokiej próby — to nagroda za zaufanie
+  for (let i = 0; i < 500; i++) {
+    assert(['epic', 'set', 'legend'].includes(ItemDB.underCounterRarity()),
+      'towar spod lady wylosował pospolitą rzadkość');
+  }
 });
 
 test('pokonanie bossa odblokowuje schody', () => {

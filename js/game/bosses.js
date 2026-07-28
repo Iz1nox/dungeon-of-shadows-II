@@ -314,13 +314,12 @@ const Bosses = {
     Game.msg('✨ +' + ess + ' Esencji Dusz', 'magic');
     // unikalna relikwia bossa (finałowy zawsze; reszta często)
     let item = null;
-    if (b.def_.legendary && (b.final || U.chance(.6))) {
+    if (b.def_.legendary && (b.final || U.chance(BAL.bossRelicChance))) {
       item = ItemDB.makeLegendById(b.def_.legendary, s.floor);
       if (item) Game.msg('🌟 ' + b.name + ' upuszcza swoją relikwię!', 'gold');
     }
     if (!item) {
-      const rarity = U.chance(.35) ? 'set' : 'epic';
-      item = ItemDB.rollEquip(s.floor, { rarity, luck: s.p.d.luck });
+      item = ItemDB.rollEquip(s.floor, { rarity: ItemDB.bossRewardRarity(), luck: s.p.d.luck });
     }
     s.drops.push({ x: b.x, y: b.y, item, bob: 0 });
     if (item.rarity === 'legend') Meta.unlock('legend_find');

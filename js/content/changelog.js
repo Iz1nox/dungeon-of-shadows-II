@@ -3,6 +3,16 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.7.4', date: '27.07.2026', name: 'Cena Potęgi',
+    items: [
+      '💎 <b>Potężne przedmioty są znów rzadkie</b> — z ~38 epików i 11 legend na wyprawę zostało ~14 i ~3. Znalezienie legendy ma znaczyć wydarzenie, a nie codzienność',
+      '🌟 <b>Legendy pochodzą teraz głównie od bossów</b> — każdy ma swoją relikwię, a Serce Otchłani nagradza nią zawsze',
+      '⚔️ Areny i perełka u handlarza dają porządny łup, ale nie zawsze epicki',
+      '🕯️ Towar spod lady pozostaje wyłącznie zestawowy albo legendarny — to nagroda za zaufanie Wita',
+      '🎲 Hazard mniej hojny, ale nadal wyraźnie lepszy niż zwykły łup',
+    ],
+  },
+  {
     v: '1.7.3', date: '27.07.2026', name: 'Zwierzę Wie, Kiedy Uskoczyć',
     items: [
       '🤸 <b>Zwinni wrogowie uskakują przed pociskami</b> — im głębiej, tym lepiej im to wychodzi (elity ponad połowę razy). Golemy i zombie są na to za ociężałe',

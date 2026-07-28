@@ -4,7 +4,7 @@
 // =============================================
 'use strict';
 
-const GAME_VERSION = '1.7.3';
+const GAME_VERSION = '1.7.4';
 const SAVE_VERSION = 1;
 const SAVE_KEY = 'dos2_save_';
 const META_KEY = 'dos2_meta';
@@ -114,7 +114,7 @@ const BAL = {
   shopRefreshGrowth: 1.85,    // każde kolejne odświeżenie na tym piętrze droższe
   gambleBase: 70,             // cena „nieopisanego przedmiotu"
   gamblePerFloor: 34,
-  gambleLuck: 5,              // o ile lepsze losowanie rzadkości niż zwykły drop
+  gambleLuck: 2,              // o ile lepsze losowanie rzadkości niż zwykły drop
   dustPrice: 8,               // ile złota za 1 Pył Otchłani
   buybackSlots: 3,
   repPerGoldSpent: 1 / 25,    // zaufanie handlarza za wydane złoto
@@ -146,8 +146,12 @@ const BAL = {
   aiStrafeFlip: 3.5,          // co ile sekund zmieniają kierunek okrążania
   aiTelegraphFlee: 2.2,       // jak szybko uciekają z zapowiedzianego uderzenia
 
+  // łupy gwarantowane
+  bossRelicChance: .2,        // szansa, że boss upuści swoją unikalną relikwię
+                              // (finałowy zawsze — przejście gry ma nagrodzić)
+
   // arena wyzwania
-  challengeChance: .6,
+  challengeChance: .42,
   challengeWaves: 3,
   challengeEssence: 12,
 };

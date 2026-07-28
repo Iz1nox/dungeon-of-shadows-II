@@ -49,6 +49,12 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.7.4**
+- 💎 ekonomia łupów: ~38 → ~14 epik+ i ~11 → ~3 legend na wyprawę
+- 🌟 legendy głównie z relikwii bossów (`BAL.bossRelicChance`)
+- 🧮 rzadkości nagród gwarantowanych w jednym miejscu (`ItemDB.*RewardRarity`),
+  dzięki czemu sonda balansu mierzy dokładnie to, co robi gra
+
 **1.7.3**
 - 🤸 uskoki przed pociskami (szansa rośnie z piętrem, elity +20%, sufit 60%)
 - 🌀 okrążanie gracza przez ścigających, krążenie strzelców w zasięgu

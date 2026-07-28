@@ -240,9 +240,9 @@ const ItemDB = {
       ['common', Math.max(6, 46 - f * 2.4)],
       ['magic', 32 + f * .4],
       ['rare', 6 + f * 1.1],
-      ['epic', Math.max(0, f - 3) * .8],
-      ['set', Math.max(0, f - 4) * .55],
-      ['legend', Math.max(0, f - 5) * .33],
+      ['epic', Math.max(0, f - 6) * .38],
+      ['set', Math.max(0, f - 9) * .22],
+      ['legend', Math.max(0, f - 12) * .10],
     ];
     let total = 0; for (const [, v] of w) total += v;
     let r = Math.random() * total;
@@ -384,6 +384,37 @@ const ItemDB = {
   salvageValue(item) {
     const rMult = { common: 1, magic: 2, rare: 4, epic: 8, set: 10, legend: 15 }[item.rarity] || 1;
     return Math.max(2, Math.round((3 + item.lvl * 1.2) * rMult + item.plus * 6));
+  },
+
+  // ===== RZADKOŚĆ NAGRÓD GWARANTOWANYCH =====
+  // Jedno miejsce dla wszystkich „pewnych" źródeł łupu, żeby dało się
+  // stroić ekonomię w jednym pliku — i żeby sonda balansu mierzyła
+  // dokładnie to, co robi gra, zamiast powtarzać jej logikę u siebie.
+  rewardRarity(table) {
+    const r = Math.random();
+    let acc = 0;
+    for (const [rarity, chance] of table) {
+      acc += chance;
+      if (r < acc) return rarity;
+    }
+    return table[table.length - 1][0];
+  },
+
+  arenaRewardRarity() {
+    return this.rewardRarity([['legend', .02], ['set', .08], ['epic', .28], ['rare', .62]]);
+  },
+
+  // nagroda pocieszenia, gdy boss nie upuścił swojej relikwii
+  bossRewardRarity() {
+    return this.rewardRarity([['set', .08], ['epic', .25], ['rare', .67]]);
+  },
+
+  shopFeaturedRarity() {
+    return this.rewardRarity([['legend', .03], ['set', .08], ['epic', .24], ['rare', .65]]);
+  },
+
+  underCounterRarity() {
+    return this.rewardRarity([['legend', .12], ['set', .88]]);
   },
 
   // ile części każdego zestawu jest założonych
