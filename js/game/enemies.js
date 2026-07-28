@@ -13,13 +13,17 @@ const Enemies = {
     const def = EnemyDB.types[typeId];
     const floor = Game.s.floor;
     const dif = Game.diff();
+    // mnożnik krainy wyrównuje krzywą trudności — wczesne biomy były
+    // wyraźnie za słabe względem tempa, w jakim rośnie gracz
+    const bio = (Game.s.map && Game.s.map.biome && Game.s.map.biome.diff)
+      || BiomeDB.forFloor(floor).diff || { hp: 1, atk: 1 };
     const m = this.floorMult(floor) * (opts.mult || 1);
-    const hp = Math.round(def.hp * m * dif.enemyHp);
+    const hp = Math.round(def.hp * m * dif.enemyHp * bio.hp);
     const e = {
       id: typeId, name: def.name, icon: def.icon, color: def.color,
       x, y, radius: def.big ? .45 : .34,
       hp, maxHp: hp, hpGhost: 1,
-      atk: def.atk * m * dif.enemyAtk, def: def.def * (1 + (floor - 1) * .03),
+      atk: def.atk * m * dif.enemyAtk * bio.atk, def: def.def * (1 + (floor - 1) * .03),
       xp: def.xp, gold: def.gold,
       speed: def.speed, baseSpeed: def.speed * (Game.hasPact('haste') ? 1.25 : 1),
       ai: def.ai, element: def.element || 'phys',

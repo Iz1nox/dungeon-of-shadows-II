@@ -47,8 +47,20 @@ Meta.data.difficulty = 'normal';
 const CELE = {
   epicPlusNaWyprawe: [8, 14],   // ile przedmiotów epik+ powinno wpaść
   legendNaWyprawe: [1, 3],
-  przewaga: [3, 6],             // TTD / TTK
+  // Ile grup po 5 wrogów gracz wyczyści bez leczenia. To lepsza miara niż
+  // „jeden wróg kontra stojący gracz", bo gra polega na walce z grupami —
+  // tamten wskaźnik nigdy nie zszedłby do sensownych wartości i tylko mylił.
+  grupyDoSmierci: [1.5, 3],
+  // Na piętrze bywa 15-34 wrogów, więc szybkie ubijanie pojedynczej sztuki
+  // jest zamierzone — dłuższe TTK zmieniłoby walkę w mielenie gąbek.
+  ttkSekundy: [.5, 1.5],
 };
+
+const PACK = 5;                 // ilu wrogów liczymy w grupie
+const ATAKUJACYCH = 2.5;        // ilu średnio dosięga gracza naraz
+// Gracz nie wali wyłącznie podstawowym atakiem — wplata umiejętności,
+// które biją mocniej. Bez tej poprawki model zaniżałby jego siłę.
+const UMIEJETNOSCI = 1.7;
 
 function bar(v, [lo, hi]) {
   if (v < lo) return '⬇ poniżej celu';
@@ -124,25 +136,37 @@ lootAudit();
 
 // =====================================================================
 console.log('\n═══ 2. KRZYWA MOCY ═══');
-console.log('   TTK = sekundy na zabicie przeciętnego wroga danego piętra');
-console.log('   TTD = sekundy, w których przeciętny wróg zabiłby stojącego gracza');
-console.log('   przewaga = TTD / TTK  (cel: ' + CELE.przewaga.join('-') + '×)\n');
+console.log('   TTK   = sekundy na zabicie przeciętnego wroga (cel ' + CELE.ttkSekundy.join('-') + ' s)');
+console.log('   grupy = ile grup po ' + PACK + ' wrogów gracz wyczyści bez leczenia');
+console.log('           (cel ' + CELE.grupyDoSmierci.join('-') + '; zakładamy, że ' + ATAKUJACYCH + ' wrogów dosięga naraz)\n');
 
 function referencePlayer(cls, floor) {
   Game.s = Game.newRunState(cls);
   const p = Game.s.p;
   Game.s.floor = floor;
-  p.level = Math.round(2 + floor * 1.15);
+  p.level = Math.max(1, Math.round(1 + floor * 1.15));
   const picks = ['strength', 'vitality', 'precision', 'brutality', 'armor'];
   for (let i = 0; i < p.level - 1; i++) {
     const t = picks[i % picks.length];
     p.talents[t] = (p.talents[t] || 0) + 1;
   }
-  const rarityFor = f => f <= 3 ? 'magic' : f <= 7 ? 'rare' : 'epic';
-  for (const slot of ['weapon', 'helmet', 'armor', 'boots', 'amulet', 'ring']) {
-    const it = ItemDB.rollEquip(floor, { slot, rarity: rarityFor(floor) });
-    it.plus = Math.min(BAL.upgradeMax, Math.floor(floor / 2));
-    p.equip[slot] = it;
+  // Ekwipunek modelujemy tak, jak realnie wygląda: gracz zakłada najlepsze
+  // z tego, co wypadło. Losujemy kilka sztuk na slot zwykłą krzywą rzadkości
+  // i zostawiamy najlepszą — bez tego model zakładałby epiki na każdym slocie,
+  // czego po przebudowie ekonomii łupów już nie ma.
+  const rank = { common: 0, magic: 1, rare: 2, epic: 3, set: 3, legend: 4 };
+  // na pierwszych piętrach gracz ma dopiero pojedyncze części — pełny komplet
+  // dopiero ok. 10. piętra
+  const slots = ['weapon', 'helmet', 'armor', 'boots', 'amulet', 'ring']
+    .slice(0, U.clamp(Math.round(floor * .7), 1, 6));
+  for (const slot of slots) {
+    let best = null;
+    for (let i = 0; i < 4; i++) {
+      const cand = ItemDB.rollEquip(floor, { slot });
+      if (!best || rank[cand.rarity] > rank[best.rarity]) best = cand;
+    }
+    best.plus = Math.min(BAL.upgradeMax, Math.floor(floor / 2.5));
+    p.equip[slot] = best;
   }
   Player.recalc(p);
   p.hp = p.d.maxHp;
@@ -160,30 +184,40 @@ function avgEnemy(floor) {
   return { hp: hp / pool.length, atk: atk / pool.length, def: def / pool.length };
 }
 
-console.log('   piętro poz.  atak    HP panc. │ wróg HP atak │   TTK    TTD  przewaga');
-console.log('   ' + '─'.repeat(70));
-const przewagi = [];
+console.log('   piętro poz.  atak    HP panc. │ wróg HP atak │   TTK   cios  grupy');
+console.log('   ' + '─'.repeat(68));
+const grupy = [], ttki = [];
+const PROBEK = 12;              // uśredniamy, bo sprzęt bohatera jest losowany
 for (const floor of [1, 3, 5, 8, 11, 14, 16]) {
-  const p = referencePlayer('warrior', floor);
   const e = avgEnemy(floor);
-  const d = p.d;
-  const critMult = 1 + d.crit * (d.critDmg - 1);
-  const perHit = d.atk * critMult * (1 - e.def / (e.def + BAL.defK));
-  const dps = perHit / (ClassDB.warrior.attack.cd * (1 - d.cdr * .5));
-  const ttk = e.hp / dps;
-  const eHit = e.atk * (1 - d.def / (d.def + BAL.defK)) * (1 - d.dodge);
-  const ttd = d.maxHp / (eHit / 0.95);
-  const ratio = ttd / ttk;
-  przewagi.push(ratio);
-  const flag = ratio > CELE.przewaga[1] ? ' ⬆' : ratio < CELE.przewaga[0] ? ' ⬇' : ' ✓';
+  let ttk = 0, packs = 0, lvl = 0, atk = 0, maxHp = 0, def = 0, eHit = 0;
+  for (let i = 0; i < PROBEK; i++) {
+    const p = referencePlayer('warrior', floor);
+    const d = p.d;
+    const critMult = 1 + d.crit * (d.critDmg - 1);
+    const perHit = d.atk * critMult * (1 - e.def / (e.def + BAL.defK));
+    const dps = perHit / (ClassDB.warrior.attack.cd * (1 - d.cdr * .5)) * UMIEJETNOSCI;
+    const t = e.hp / dps;
+    // ile obrywa gracz, zanim wybije grupę
+    const hit = e.atk * (1 - d.def / (d.def + BAL.defK)) * (1 - d.dodge);
+    const packDmg = ATAKUJACYCH * (hit / 0.95) * (t * PACK);
+    ttk += t / PROBEK; packs += (d.maxHp / packDmg) / PROBEK;
+    lvl = p.level; atk += d.atk / PROBEK; maxHp += d.maxHp / PROBEK;
+    def += d.def / PROBEK; eHit += hit / PROBEK;
+  }
+  const p = { level: lvl };
+  const d = { atk, maxHp, def };
+  grupy.push(packs); ttki.push(ttk);
+  const flag = packs > CELE.grupyDoSmierci[1] ? ' ⬆' : packs < CELE.grupyDoSmierci[0] ? ' ⬇' : ' ✓';
   console.log('   ' + String(floor).padStart(5) + String(p.level).padStart(5) +
-    String(Math.round(d.atk)).padStart(6) + String(d.maxHp).padStart(6) +
+    String(Math.round(d.atk)).padStart(6) + String(Math.round(d.maxHp)).padStart(6) +
     String(Math.round(d.def)).padStart(6) + ' │' + String(Math.round(e.hp)).padStart(8) +
     String(Math.round(e.atk)).padStart(5) + ' │' + (ttk.toFixed(1) + 's').padStart(7) +
-    (ttd.toFixed(0) + 's').padStart(7) + (ratio.toFixed(1) + '×').padStart(9) + flag);
+    (Math.round(eHit) + '').padStart(6) + (packs.toFixed(1)).padStart(7) + flag);
 }
-const sredniaPrzewaga = przewagi.reduce((a, b) => a + b, 0) / przewagi.length;
-console.log('\n   Średnia przewaga: ' + sredniaPrzewaga.toFixed(1) + '×   ' + bar(sredniaPrzewaga, CELE.przewaga));
+const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+console.log('\n   Średnie TTK: ' + avg(ttki).toFixed(1) + ' s   ' + bar(avg(ttki), CELE.ttkSekundy));
+console.log('   Średnio grup do śmierci: ' + avg(grupy).toFixed(1) + '   ' + bar(avg(grupy), CELE.grupyDoSmierci));
 
 // =====================================================================
 console.log('\n═══ 3. ZAGROŻENIA TERENU ═══\n');

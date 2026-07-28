@@ -3,6 +3,15 @@
 // Historia aktualizacji — wyświetlana w menu „Nowości".
 const ChangelogDB = [
   {
+    v: '1.7.5', date: '27.07.2026', name: 'Otchłań Się Broni',
+    items: [
+      '⚔️ <b>Wyrównana krzywa trudności</b> — pomiary pokazały, że pierwsza trzecia gry była trywialna, a środek i koniec wyważone. Wczesne krainy zostały wzmocnione, dalsze zostawione w spokoju',
+      '🪦 <b>Zrujnowane Katakumby</b>: wrogowie +70% zdrowia i +40% obrażeń — Szczur Grobowy nie ginie już od dwóch machnięć',
+      '🍄 <b>Grzybowe Jaskinie</b> +35% zdrowia, <b>Zamarznięta Głębia</b> lekko w górę',
+      '🌋 Płonące Trzewia, Pałac Zwierciadeł i Serce Otchłani bez zmian — tam balans był w porządku',
+    ],
+  },
+  {
     v: '1.7.4', date: '27.07.2026', name: 'Cena Potęgi',
     items: [
       '💎 <b>Potężne przedmioty są znów rzadkie</b> — z ~38 epików i 11 legend na wyprawę zostało ~14 i ~3. Znalezienie legendy ma znaczyć wydarzenie, a nie codzienność',

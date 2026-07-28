@@ -49,6 +49,13 @@ Bez zależności, bez builda — czysty JavaScript + Canvas.
 
 ## Changelog
 
+**1.7.5**
+- ⚔️ mnożniki trudności per kraina (`BiomeDB.list[].diff`) wyrównujące krzywą:
+  katakumby ×1,7 hp / ×1,4 atk, grzyby ×1,35/×1,22, lód ×1,08/×1,05, reszta bez zmian
+- 📊 sonda balansu: miara „ile grup po 5 wrogów gracz wyczyści bez leczenia"
+  zamiast mylącego TTD, uśrednianie po 12 losowaniach sprzętu, model uwzględnia
+  umiejętności i to, że na pierwszych piętrach nie ma się pełnego kompletu
+
 **1.7.4**
 - 💎 ekonomia łupów: ~38 → ~14 epik+ i ~11 → ~3 legend na wyprawę
 - 🌟 legendy głównie z relikwii bossów (`BAL.bossRelicChance`)
